@@ -1,0 +1,68 @@
+###################################
+###################################
+#### global_dev_config
+####
+cf_dev_name=CoolEyeD1;
+cf_dev_version=V1.0;
+#
+###################################
+###################################
+#
+#####################################
+#####################################
+#### global_imu_config
+####
+# calibration 1=Enable  0 = disable;
+cf_imu_uart=/dev/ttyUSB0;
+cf_imu_icm20689_acc_bias_X=328.476562;
+cf_imu_icm20689_acc_bias_Y=-40.180664;
+cf_imu_icm20689_acc_bias_Z=2.004883;
+cf_imu_icm20689_gyro_bias_X=69.083008;
+cf_imu_icm20689_gyro_bias_Y=318.983582;
+cf_imu_icm20689_gyro_bias_Z=7.027148;
+cf_imu_icm20689_acc_T[0][0]=1.001493;
+cf_imu_icm20689_acc_T[0][1]=0.001994;
+cf_imu_icm20689_acc_T[0][2]=0.030158;
+cf_imu_icm20689_acc_T[1][0]=0.039036;
+cf_imu_icm20689_acc_T[1][1]=1.001209;
+cf_imu_icm20689_acc_T[1][2]=0.011952;
+cf_imu_icm20689_acc_T[2][0]=-0.019433;
+cf_imu_icm20689_acc_T[2][1]=-0.000653;
+cf_imu_icm20689_acc_T[2][2]=0.981460;
+cf_imu_icm20689_sample_rate=1000;
+######################################
+######################################
+#
+###################################
+###################################
+#### global_cam_config
+####
+#mode : left=1;right =2;streoe =3;
+cf_cam_mode=3;
+#VGA = 1  WVGA = 2
+cf_cam_resolution=2;
+# FPS: 1~27 is option.
+cf_cam_FPS=27;
+##EG_MODE
+#  0 :  Manual mode
+#  1 : AEC/AGC mode
+#  2 : AEC / Manual Gain
+#  3 : default and do nothing
+#  4 : just set skip frame
+cf_cam_EG_mode=0;
+# 0 : Manual mode #######
+cf_cam_man_exp=200;
+cf_cam_man_gain=50;
+# 1 : AEC/AGC mode#########
+cf_cam_auto_EG_top=200;
+cf_cam_auto_EG_bottom=5;
+cf_cam_auto_EG_des=158;
+# 2 : AEC / Manual Gain####
+cf_cam_auto_E_man_G_Etop=300;
+cf_cam_auto_E_man_G_Ebottom=4;
+cf_cam_auto_E_man_G=500;
+# 3 : default and do nothing#####
+# 4 : just set skip frame #######
+cf_cam_agc_aec_skip_frame=0;
+#####################################
+#####################################

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libCELIB_MadgwickAHRS.a  CMakeFiles/CELIB_MadgwickAHRS.dir/src/celib_MadgwickAHRS.cpp.o
+/usr/bin/ranlib libCELIB_MadgwickAHRS.a

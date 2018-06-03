@@ -1,0 +1,8 @@
+prefix=/home/liuwei/src/CoolEyeD1/ros/devel
+
+Name: cooleye_d1
+Description: Description of cooleye_d1
+Version: 0.0.0
+Cflags: -I/home/liuwei/src/CoolEyeD1/ros/src/cooleye_d1/include
+Libs: -L/home/liuwei/src/CoolEyeD1/ros/devel/lib 
+Requires: sensor_msgs std_msgs cv_bridge image_transport message_runtime

@@ -1,0 +1,3 @@
+file(REMOVE_RECURSE
+  "libCEDRIVER_CONFIG.a"
+)

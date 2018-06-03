@@ -1,0 +1,2 @@
+/usr/bin/ar qc libCEDRIVER_CAM.a  CMakeFiles/CEDRIVER_CAM.dir/src/cedriver_usb.cpp.o CMakeFiles/CEDRIVER_CAM.dir/src/cedriver_cam.cpp.o
+/usr/bin/ranlib libCEDRIVER_CAM.a

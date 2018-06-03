@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC  -pthread -std=c++0x  -shared -Wl,-soname,libCEDRIVER_CAM.so -o /home/liuwei/src/CoolEyeD1/ros/devel/lib/libCEDRIVER_CAM.so CMakeFiles/CEDRIVER_CAM.dir/src/cedriver_usb.cpp.o CMakeFiles/CEDRIVER_CAM.dir/src/cedriver_cam.cpp.o 

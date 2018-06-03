@@ -1,0 +1,37 @@
+[
+{
+  "directory": "/home/liuwei/src/CoolEyeD1/sdk/build",
+  "command": "/usr/bin/c++    -I/home/liuwei/src/CoolEyeD1/sdk/include -isystem /usr/local/include -isystem /usr/local/include/opencv   -pthread -g -std=c++0x -g -g   -o CMakeFiles/CEAPP_CALI_IMU.dir/src/ceapp_cali_imu.cpp.o -c /home/liuwei/src/CoolEyeD1/sdk/src/ceapp_cali_imu.cpp",
+  "file": "/home/liuwei/src/CoolEyeD1/sdk/src/ceapp_cali_imu.cpp"
+},
+{
+  "directory": "/home/liuwei/src/CoolEyeD1/sdk/build",
+  "command": "/usr/bin/c++    -I/home/liuwei/src/CoolEyeD1/sdk/include -isystem /usr/local/include -isystem /usr/local/include/opencv   -pthread -g -std=c++0x -g -g   -o CMakeFiles/CEAPP_MAIN.dir/src/ceapp_main.cpp.o -c /home/liuwei/src/CoolEyeD1/sdk/src/ceapp_main.cpp",
+  "file": "/home/liuwei/src/CoolEyeD1/sdk/src/ceapp_main.cpp"
+},
+{
+  "directory": "/home/liuwei/src/CoolEyeD1/sdk/build",
+  "command": "/usr/bin/c++    -I/home/liuwei/src/CoolEyeD1/sdk/include   -pthread -g -std=c++0x -g -g   -o CMakeFiles/CEDRIVER_CONFIG.dir/src/cedriver_config.cpp.o -c /home/liuwei/src/CoolEyeD1/sdk/src/cedriver_config.cpp",
+  "file": "/home/liuwei/src/CoolEyeD1/sdk/src/cedriver_config.cpp"
+},
+{
+  "directory": "/home/liuwei/src/CoolEyeD1/sdk/build",
+  "command": "/usr/bin/c++    -I/home/liuwei/src/CoolEyeD1/sdk/include   -pthread -g -std=c++0x -g -g   -o CMakeFiles/CEDRIVER_CAM.dir/src/cedriver_usb.cpp.o -c /home/liuwei/src/CoolEyeD1/sdk/src/cedriver_usb.cpp",
+  "file": "/home/liuwei/src/CoolEyeD1/sdk/src/cedriver_usb.cpp"
+},
+{
+  "directory": "/home/liuwei/src/CoolEyeD1/sdk/build",
+  "command": "/usr/bin/c++    -I/home/liuwei/src/CoolEyeD1/sdk/include   -pthread -g -std=c++0x -g -g   -o CMakeFiles/CEDRIVER_CAM.dir/src/cedriver_cam.cpp.o -c /home/liuwei/src/CoolEyeD1/sdk/src/cedriver_cam.cpp",
+  "file": "/home/liuwei/src/CoolEyeD1/sdk/src/cedriver_cam.cpp"
+},
+{
+  "directory": "/home/liuwei/src/CoolEyeD1/sdk/build",
+  "command": "/usr/bin/c++    -I/home/liuwei/src/CoolEyeD1/sdk/include   -pthread -g -std=c++0x -g -g   -o CMakeFiles/CEDRIVER_IMU.dir/src/cedriver_imu.cpp.o -c /home/liuwei/src/CoolEyeD1/sdk/src/cedriver_imu.cpp",
+  "file": "/home/liuwei/src/CoolEyeD1/sdk/src/cedriver_imu.cpp"
+},
+{
+  "directory": "/home/liuwei/src/CoolEyeD1/sdk/build",
+  "command": "/usr/bin/c++    -I/home/liuwei/src/CoolEyeD1/sdk/include   -pthread -g -std=c++0x -g -g   -o CMakeFiles/CELIB_MadgwickAHRS.dir/src/celib_MadgwickAHRS.cpp.o -c /home/liuwei/src/CoolEyeD1/sdk/src/celib_MadgwickAHRS.cpp",
+  "file": "/home/liuwei/src/CoolEyeD1/sdk/src/celib_MadgwickAHRS.cpp"
+}
+]
