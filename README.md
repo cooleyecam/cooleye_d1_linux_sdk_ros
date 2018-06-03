@@ -6,10 +6,10 @@ Version 0.1
 主流的SLAM算法,图像拼接,智能识别等功能会陆续放出.
 
 
-####SDK安装方法
+#### SDK安装方法
 为了便于用户一次成功,介绍时将使用绝对使用路径.
 
-	mkdir  ~/src
+	mkdir -p ~/src
 	cd ~/src
 	git clone https://github.com/cooleyecam/cooleye_d1_linux_sdk_ros.git
 	mkdir -p ~/src/cooleye_d1_linux_sdk_ros/sdk/build
@@ -18,13 +18,12 @@ Version 0.1
 	make 
 编译将生成2个文件
 - CEAPP_MAIN   :  运行即可直接显示相机输出.
-	
-	./CEAPP_MAIN 
 
+	./CEAPP_MAIN 
 - CEAPP_CALI_IMU : 用于校准相机自带的IMU的初始偏移. 这个六面矫正法移植自PX4的飞控固件,用起来比较麻烦,但是效果还可以,在发布自动矫正的软件版本之前,先临时用来修正IMU的误差.运行后根据操作.程序会自己将计算出的误差写入配置文件中,用户无需操作.
 
 
-####ROS环境安装方法
+#### ROS环境安装方法
 在这之前请先根据ros官网安装kinetic版本,建议使用kinetic版本.其他的版本在后续使用算法时可能会有些兼容问题.请先安装完SDK再安装ROS.
 
 	cd ~/src/cooleye_d1_linux_sdk_ros/sdk/config/
@@ -43,7 +42,7 @@ Version 0.1
 	rostopic hz /imu0_icm20689 /cooleyed1/left/image_raw /cooleyed1/right/image_raw
 
 
-####修订历史
+#### 修订历史
 - 2018-06-03手册首次发布
 
 
