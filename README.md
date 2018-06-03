@@ -18,15 +18,9 @@ Version 0.1
 	make 
 编译将生成2个文件
 - CEAPP_MAIN   :  运行即可直接显示相机输出.
-<<<<<<< HEAD
-
+	
 	./CEAPP_MAIN 
 
-
-=======
-
-	./CEAPP_MAIN 
->>>>>>> d84c207129d573d5591afd9a2d6627c9eb4303e2
 - CEAPP_CALI_IMU : 用于校准相机自带的IMU的初始偏移. 这个六面矫正法移植自PX4的飞控固件,用起来比较麻烦,但是效果还可以,在发布自动矫正的软件版本之前,先临时用来修正IMU的误差.运行后根据操作.程序会自己将计算出的误差写入配置文件中,用户无需操作.
 
 
@@ -49,12 +43,7 @@ Version 0.1
 	rostopic hz /imu0_icm20689 /cooleyed1/left/image_raw /cooleyed1/right/image_raw
 
 
-<<<<<<< HEAD
-####修订历史
-
-=======
 #### 修订历史
->>>>>>> d84c207129d573d5591afd9a2d6627c9eb4303e2
 - 2018-06-03手册首次发布
 
 
