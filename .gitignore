@@ -1,4 +1,5 @@
 *.swp
+*.swo
 *.kdev4
 sdk/build/*
 ros/build/*
