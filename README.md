@@ -6,11 +6,9 @@ Version 0.1
 主流的SLAM算法,图像拼接,智能识别等功能会陆续放出。
 
 #### 依赖软件安装
-推荐环境：ubuntu 16.04 LTS
-
-推荐opencv版本：3.4.0
-
-推荐ROS版本：Kinetic
+- 推荐环境：ubuntu 16.04 LTS
+- 推荐opencv版本：3.4.0
+- 推荐ROS版本：Kinetic
 
 #### SDK安装方法
 为了便于用户一次成功,介绍时将使用绝对使用路径。
