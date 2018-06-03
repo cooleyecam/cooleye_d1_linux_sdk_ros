@@ -1,2 +1,0 @@
-/usr/bin/ar qc libCEDRIVER_CONFIG.a  CMakeFiles/CEDRIVER_CONFIG.dir/src/cedriver_config.cpp.o
-/usr/bin/ranlib libCEDRIVER_CONFIG.a

@@ -1,1 +1,0 @@
-/usr/bin/c++  -fPIC  -pthread -std=c++0x  -shared -Wl,-soname,libCEDRIVER_IMU.so -o /home/liuwei/src/CoolEyeD1/ros/devel/lib/libCEDRIVER_IMU.so CMakeFiles/CEDRIVER_IMU.dir/src/cedriver_imu.cpp.o 

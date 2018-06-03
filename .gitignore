@@ -1,0 +1,6 @@
+*.swp
+*.kdev4
+sdk/build/*
+ros/build/*
+ros/devel/*
+*.catkin_workspace

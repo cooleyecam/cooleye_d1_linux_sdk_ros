@@ -1,2 +1,0 @@
-cooleye_d1
--DCATKIN_DEVEL_PREFIX=/home/liuwei/src/CoolEyeD1/ros/devel -DCMAKE_INSTALL_PREFIX=/home/liuwei/src/CoolEyeD1/ros/install -G Unix Makefiles
