@@ -496,17 +496,21 @@ static void* ce_imu_showdata(void *)
         }
 
 
-        std::cout << "stamp :" << std::setprecision(15)<< ticm20689_pkg->timestamp << std::endl;
-        std::cout << "Acc X :" << ticm20689_pkg->ax << std::endl;
-        std::cout << "Acc Y :" << ticm20689_pkg->ay << std::endl;
-        std::cout << "Acc Z :" << ticm20689_pkg->az << std::endl;
+//         std::cout << "stamp :" << std::setprecision(15)<< ticm20689_pkg->timestamp << std::endl;
+//         std::cout << "Acc X :" << ticm20689_pkg->ax << std::endl;
+//         std::cout << "Acc Y :" << ticm20689_pkg->ay << std::endl;
+//         std::cout << "Acc Z :" << ticm20689_pkg->az << std::endl;
+// 
+//         std::cout << "Gyr X :" << ticm20689_pkg->rx << std::endl;
+//         std::cout << "Gyr Y :" << ticm20689_pkg->ry << std::endl;
+//         std::cout << "Gyr Z :" << ticm20689_pkg->rz << std::endl;
 
-        std::cout << "Gyr X :" << ticm20689_pkg->rx << std::endl;
-        std::cout << "Gyr Y :" << ticm20689_pkg->ry << std::endl;
-        std::cout << "Gyr Z :" << ticm20689_pkg->rz << std::endl;
-
-//      MadgwickAHRSupdateIMU(ticm20689_pkg->rx,ticm20689_pkg->ry,ticm20689_pkg->rz,
-//                                 ticm20689_pkg->ax,ticm20689_pkg->ay,ticm20689_pkg->az);
+      MadgwickAHRSupdateIMU( 3.1415926f * ticm20689_pkg->rx / 180.0f,
+                            3.1415926f * ticm20689_pkg->ry / 180.0f,
+                            3.1415926f * ticm20689_pkg->rz / 180.0f,
+                            ticm20689_pkg->ax,
+                            ticm20689_pkg->ay,
+                            ticm20689_pkg->az);
         
         delete ticm20689_pkg;
         ticm20689_pkg = NULL;

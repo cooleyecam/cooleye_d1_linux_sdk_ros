@@ -223,21 +223,13 @@ void MadgwickAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, flo
 	q3 *= recipNorm;
 
     
-    std::cout << "q0 =" << q0 <<std::endl; 
-    std::cout << "q1 =" << q1 <<std::endl; 
-    std::cout << "q2 =" << q2 <<std::endl; 
-    std::cout << "q3 =" << q3 <<std::endl; 
- 
+    float Pitch = (float)-asin(-2*q1*q3 + 2*q0*q2) * 57.3;
+    float Roll  = (float)atan2( 2*q2*q3 + 2*q0*q1, -2*q1*q1 - 2*q2*q2 + 1) * 57.3;
+    float Yaw = (float)atan2(2*q1*q2 + 2*q0*q3, q0*q0 + q1*q1 - q2*q2 - q3*q3) * 57.3;
     
-    
-    
-//     float Pitch = (float)asin(-2 * q1 * q3 + 2 * q0* q2)*57.3;
-//     float Roll  = (float)atan2( 2*q1*q2 + 2*q0*q3, 2*q0*q0+2*q1*q1-1)*57.3;
-//     float Yaw = (float)atan2(2 * q2 * q3 - 2 * q0 * q1, 2 * q0 * q0 + 2 * q3* q3 -1)*57.3;
-//     
-//     std::cout << "Pitch =" << Pitch <<std::endl; 
-//     std::cout << "Roll =" << Roll <<std::endl; 
-//     std::cout << "Yaw =" << Yaw <<std::endl; 
+    std::cout << "Pitch =" << Pitch <<std::endl; 
+    std::cout << "Roll =" << Roll <<std::endl; 
+    std::cout << "Yaw =" << Yaw <<std::endl; 
     
 }
 
@@ -245,21 +237,16 @@ void MadgwickAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, flo
 // Fast inverse square-root
 // See: http://en.wikipedia.org/wiki/Fast_inverse_square_root
 
-// float invSqrt(float x) {
-// 	float halfx = 0.5f * x;
-// 	float y = x;
-// 	long i = *(long*)&y;
-// 	i = 0x5f3759df - (i>>1);
-// 	y = *(float*)&i;
-// 	y = y * (1.5f - (halfx * y * y));
-// 	return y;
-// }
-
-
 float invSqrt(float x) {
-	float y = sqrt(x);
+	float halfx = 0.5f * x;
+	float y = x;
+	long i = *(long*)&y;
+	i = 0x5f3759df - (i>>1);
+	y = *(float*)&i;
+	y = y * (1.5f - (halfx * y * y));
 	return y;
 }
+
 
 //====================================================================================================
 // END OF CODE
