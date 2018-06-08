@@ -128,7 +128,7 @@ cd ~/kalibr_workspace/src
 git clone https://github.com/ethz-asl/Kalibr.git
 ```
 
-4. 编译项目。__-j4__ 根据自己电脑选择，四核就用__-j4__，8核就用__-j8__。编译需要很久，很久，真的很久，很久。
+4. 编译项目。__-j4__ 根据自己电脑选择，四核就用__-j4__ ，8核就用__-j8__。编译需要很久，很久，真的很久，很久。
 ```
 cd ~/kalibr_workspace 
 catkin build -DCMAKE_BUILD_TYPE=Release -j4
@@ -256,14 +256,15 @@ chmod +x build_ros.sh
 ### 4.1 IMU操作固件升级
 目前版本硬件，IMU的控制依赖于一个小型的单片机，如果需要升级，sdk/update会直接发布程序的HEX文件。windows下可使用FlyMcu进行升级，操作步骤见下图。另，熟悉STM32的用户，可根据自己习惯选择自己喜欢的升级方式。
 
-![Alt text](./1528444485897.png)
+![p1](https://ws4.sinaimg.cn/large/006tNc79gy1fs45hbvz2uj30lo0et410.jpg)
 
 ### 4.2 图像处理固件升级
  目前版本硬件，图像Sensor的控制使用了Cypress的方案，sdk/update提供了windows下的驱动文件和升级工具，同时也会直接发布用于升级的IIC文件。升级步骤见下图。
  如果设备在电脑端识别异常，请在设备管理器中卸载设备驱动，然后更新驱动指向driver文件夹，比如：
 D:\Cypress\USB\CY3684_EZ-USB_FX2LP_DVK\1.1\Drivers\vista
 需要注意的是，这里只需指向vista即可，请勿继续选择其子目录x86或x64，可能会造成识别异常。
- ![Alt text](./1528445067142.png)
+
+ ![p2](https://ws4.sinaimg.cn/large/006tNc79gy1fs45hhn7e2j30is0f3gow.jpg)
 
 
 -------------------------------------------------------------------------------------------------
