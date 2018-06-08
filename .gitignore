@@ -2,6 +2,7 @@
 *.swo
 *.kdev4
 sdk/build/*
+sdk/.kdev4
 ros/build/*
 ros/devel/*
 *.catkin_workspace
