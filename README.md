@@ -128,7 +128,7 @@ cd ~/kalibr_workspace/src
 git clone https://github.com/ethz-asl/Kalibr.git
 ```
 
-4. 编译项目。__-j4__ 根据自己电脑选择，四核就用__-j4__ ，8核就用__-j8__。编译需要很久，很久，真的很久，很久。
+4. 编译项目。__-j4__ 根据自己电脑选择，四核就用 __-j4__ ，8核就用 __-j8__ 。编译需要很久，很久，真的很久，很久。
 ```
 cd ~/kalibr_workspace 
 catkin build -DCMAKE_BUILD_TYPE=Release -j4
