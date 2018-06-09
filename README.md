@@ -31,6 +31,10 @@ cd ~/src
 
 git clone https://github.com/cooleyecam/cooleye_d1_linux_sdk_ros.git
 
+cd ~/src/cooleye_d1_linux_sdk_ros/sdk/config
+
+sudo ./cooleye_cam_set.sh
+
 mkdir -p ~/src/cooleye_d1_linux_sdk_ros/sdk/build
 
 cd ~/src/cooleye_d1_linux_sdk_ros/sdk/build
@@ -118,22 +122,29 @@ sudo pip install python-igraph --upgrade
 
 ```
 mkdir -p ~/kalibr_workspace/src 
+
 cd ~/kalibr_workspace 
+
 source /opt/ros/kinetic/setup.bash 
+
 catkin init 
+
 catkin config --extend /opt/ros/kinetic
+
 catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release
 ```
 
 3. 下载源代码至src文件目录
 ```
 cd ~/kalibr_workspace/src 
+
 git clone https://github.com/ethz-asl/Kalibr.git
 ```
 
 4. 编译项目。__-j4__ 根据自己电脑选择，四核就用 __-j4__ ，8核就用 __-j8__ 。编译需要很久，很久，真的很久，很久。
 ```
 cd ~/kalibr_workspace 
+
 catkin build -DCMAKE_BUILD_TYPE=Release -j4
 ```
 
@@ -196,37 +207,56 @@ ORB_SLAM2是比较火的算法，并熟悉SLAM的人也可以通过它快速搭�
 安装依赖包
 ```
 sudo apt-get install libglew-dev
+
 sudo apt-get install libpython2.7-dev
+
 sudo apt-get install ffmpeg libavcodec-dev libavutil-dev libavformat-dev libswscale-dev libavdevice-dev
+
 sudo apt-get install libdc1394-22-dev libraw1394-dev
+
 sudo apt-get install libjpeg-dev libpng12-dev libtiff5-dev libopenexr-dev
 
 ```
 安装一个libuvc
 ```
 mkdir -p ~/src
+
 cd ~/src
+
 git clone https://github.com/ktossell/libuvc
+
 cd libuvc
+
 mkdir build
+
 cd build
+
 cmake ..
+
 make && sudo make install
 ```
 下载 Pangolin
 ```
 mkdir -p ~/src
+
 cd ~/src
+
 git clone https://github.com/stevenlovegrove/Pangolin.git
+
 cd Pangolin
+
 mkdir build
+
 cd build
+
 cmake ..
+
 cmake --build .
 ```
 Pangolin python bindings
 ```
 sudo python -mpip install numpy pyopengl Pillow pybind11
+
 git submodule init && git submodule update
 ```
 
@@ -241,13 +271,21 @@ sudo apt-get install libeigen3-dev
 #### 安装ORB_SLAM2
 ```
 mkdir -p ~/src
+
 cd ~/src
+
 git clone https://github.com/raulmur/ORB_SLAM2.git ORB_SLAM2
+
 cd ORB_SLAM2
+
 chmod +x build.sh
+
 ./build.sh
+
 export ROS_PACKAGE_PATH=${ROS_PACKAGE_PATH}:~/src/ORB_SLAM2/Examples/ROS
+
 chmod +x build_ros.sh
+
 ./build_ros.sh
 ```
 至此编译完成。
