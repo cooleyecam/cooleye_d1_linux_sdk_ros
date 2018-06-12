@@ -375,6 +375,12 @@ ${PROJECT_SOURCE_DIR}/../../../lib/libboost_system.so
 )
 ```
 
+
+### 6. 硬件尺寸图
+下图说明了相机的IMU和双目之间的结构图关系，由于是正视图，因此左右相机正好相反，使用时注意：
+
+![enter image description here](https://ws1.sinaimg.cn/large/006tKfTcgy1fs8og6na6pj318g0eu0tl.jpg)
+
 -------------------------------------------------------------------------------------------------
 
 ### 修订历史
