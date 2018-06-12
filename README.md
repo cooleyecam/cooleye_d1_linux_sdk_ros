@@ -1,5 +1,5 @@
 # CoolEye D1 Linux SDK & ROS 
-### Version 0.1
+### Version 0.2
 本项目包括CoolEye D1 相机运行所需的必备文件,为了便于用于学习和使用,内容全部开源。
 主流的SLAM算法,图像拼接,智能识别等功能会陆续放出。
 
@@ -286,6 +286,60 @@ chmod +x build_ros.sh
 ```
 至此编译完成。
 
+
+
+### 3.2 okvis算法的安装和使用
+OKVIS: Open Keyframe-based Visual-Inertial SLAM. 也是常用的开源项目之一。
+首先安装依赖包。
+```
+sudo apt-get install cmake libgoogle-glog-dev libatlas-base-dev libeigen3-dev libsuitesparse-dev libboost-dev libboost-filesystem-dev libopencv-dev
+```
+下载okvis算法包
+```
+mkdir -p ~/src
+cd ~/src
+git clone https://github.com/ethz-asl/okvis.git
+cd ~/src/okvis
+mkdir build && cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make -j8
+make install
+```
+至此，编译安装完成。
+
+如果，如果遇到以下ERROR，这是由于ceres-solver无法安装导致的。
+```
+  Failed to clone repository:
+  'https://ceres-solver.googlesource.com/ceres-solver'
+
+
+CMakeFiles/ceres_external.dir/build.make:89: recipe for target 'ceres/src/ceres_external-stamp/ceres_external-download' failed
+make[2]: *** [ceres/src/ceres_external-stamp/ceres_external-download] Error 1
+CMakeFiles/Makefile2:153: recipe for target 'CMakeFiles/ceres_external.dir/all' failed
+make[1]: *** [CMakeFiles/ceres_external.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+```
+
+__解决方案如下：__
+将okvis目录下CMakeLists.txt 中，OFF修改为ON
+```
+option (USE_SYSTEM_CERES
+        "Use ceres via find_package rather than downloading it as part of okvis" OFF)
+
+改为
+option (USE_SYSTEM_CERES
+        "Use ceres via find_package rather than downloading it as part of okvis" ON)
+```
+根据以下文档独立安装ceres
+```
+https://blog.csdn.net/xiat5/article/details/79164059
+```
+删除okvis目录下的build文件夹，重新编译，问题应该就可以解决了。
+
+
+
+
+
 -------------------------------------------------------------------------------------------------
 
 ## 4. 相机固件升级方法
@@ -381,7 +435,7 @@ ${PROJECT_SOURCE_DIR}/../../../lib/libboost_system.so
 
 ### 修订历史
 - 2018-06-03手册首次发布
-- 2018-06-08增加相机升级教程，kalibr的安装教程，常见问题汇总。
-
+- 2018-06-08增加相机升级教程，kalibr的安装教程，常见问题汇总
+- 2018-06-12增加okvis算法的安装
 
 
