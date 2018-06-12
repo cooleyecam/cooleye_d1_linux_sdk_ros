@@ -174,10 +174,10 @@ kalibr_calibrate_cameras --target april_6x6.yaml  \
 kalibr_calibrate_imu_camera 可标定imu和相机之间的参数。
 ```
 kalibr_calibrate_imu_camera --bag imu2cam.bag \
-							--cam camchain-2018-05-06-21-35-46.yaml \
-							--imu imu0_icm20689.yaml  \
-							--target checkerboard_11x8_3x3cm.yaml \
-							--time-calibration
+			--cam camchain-2018-05-06-21-35-46.yaml \
+			--imu imu0_icm20689.yaml  \
+			--target checkerboard_11x8_3x3cm.yaml \
+			--time-calibration
 ```
  - --bag  imu2cam.bag 
  使用rosbag record 命令，可采集并记录.bag文件，调用采集的图像即可进行标定。记录imu和相机的时候，保持标定板不动，移动相机，尽量激活所有的imu维度。
