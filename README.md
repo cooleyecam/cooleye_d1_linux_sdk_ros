@@ -76,7 +76,6 @@ cd ~/src/cooleye_d1_linux_sdk_ros/ros
 catkin_make
 
 source ~/src/cooleye_d1_linux_sdk_ros/devel/setup.bash
-
 ```
 	
 至此编译完成.执行以下命令即可运行相机.
@@ -85,9 +84,7 @@ source ~/src/cooleye_d1_linux_sdk_ros/devel/setup.bash
 ```	
 roscore
 
-rosrun cooleye_d1 CEROS_CAM_D1_NODE 
-
-~/src/cooleye_d1_linux_sdk_ros/ros/src/cooleye_d1/config/cecfg_std.txt
+rosrun cooleye_d1 CEROS_CAM_D1_NODE  ~/src/cooleye_d1_linux_sdk_ros/ros/src/cooleye_d1/config/cecfg_std.txt
 ```
 可使用ros命令观察相机运行状态
 ```
@@ -215,7 +212,6 @@ sudo apt-get install ffmpeg libavcodec-dev libavutil-dev libavformat-dev libswsc
 sudo apt-get install libdc1394-22-dev libraw1394-dev
 
 sudo apt-get install libjpeg-dev libpng12-dev libtiff5-dev libopenexr-dev
-
 ```
 安装一个libuvc
 ```
