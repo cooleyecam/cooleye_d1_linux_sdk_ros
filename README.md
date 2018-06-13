@@ -109,6 +109,7 @@ http://wiki.ros.org/camera_calibration/Tutorials/StereoCalibration
 安装所需要的ros文件
 ```
 rosdep install camera_calibration
+
 rosmake camera_calibration
 ```
 #### 2.1.3 使用cooleye相机在ros环境下发布左右图像的topic
@@ -463,12 +464,19 @@ sudo apt-get install cmake libgoogle-glog-dev libatlas-base-dev libeigen3-dev li
 下载okvis算法包
 ```
 mkdir -p ~/src
+
 cd ~/src
+
 git clone https://github.com/ethz-asl/okvis.git
+
 cd ~/src/okvis
+
 mkdir build && cd build
+
 cmake -DCMAKE_BUILD_TYPE=Release ..
+
 make -j8
+
 make install
 ```
 至此，编译安装完成。
