@@ -1,6 +1,6 @@
 create_udev_rules() {
 	echo "" > cooleye_d1_cam.rules
-	echo 'KERNEL=="*", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ACTION=="add", ATTR{idVendor}=="04b4", MODE="666" ' >> cooleye_d1_cam.rules
+	echo 'KERNEL=="*", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ACTION=="add", ATTR{idVendor}=="04b4",ATTR{idProduct}="1003", MODE="666" ' >> cooleye_d1_cam.rules
 	echo 'KERNEL=="*", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ACTION=="remove" ' >> cooleye_d1_cam.rules
 }
 
