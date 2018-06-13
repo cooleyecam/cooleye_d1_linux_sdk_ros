@@ -29,11 +29,16 @@ include_directories(
 )
 
 add_library(CEDRIVER_CONFIG src/cedriver_config.cpp)
+
 add_library(CEDRIVER_CAM src/cedriver_usb.cpp src/cedriver_cam.cpp)
-add_library(CEDRIVER_IMU src/cedriver_imu.cpp)
+
+add_library(CELIB_MadgwickAHRS src/celib_MadgwickAHRS.cpp)
+
+add_library(CEDRIVER_IMU  src/cedriver_imu.cpp )
+target_link_libraries(CEDRIVER_IMU CELIB_MadgwickAHRS )
 
 add_library(CEROS_CAM_D1_DRIVER src/ceros_cam_d1_driver.cpp) 
-target_link_libraries(CEROS_CAM_D1_DRIVER CEDRIVER_CONFIG CEDRIVER_CAM CEDRIVER_IMU usb-1.0 ${OpenCV_LIBS} ${catkin_LIBRARIES})
+target_link_libraries(CEROS_CAM_D1_DRIVER CEDRIVER_CONFIG CEDRIVER_CAM CEDRIVER_IMU CELIB_MadgwickAHRS usb-1.0 ${OpenCV_LIBS} ${catkin_LIBRARIES})
 
 
 add_executable(CEROS_CAM_D1_NODE src/ceros_cam_d1_node.cpp) 
