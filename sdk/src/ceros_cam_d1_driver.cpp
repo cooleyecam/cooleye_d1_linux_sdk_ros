@@ -94,6 +94,17 @@ void CoolEyeCamD1::img_data_stream ( )
         pub_caml_.publish(msg_l);
         pub_camr_.publish(msg_r);
 
+        
+        if(ce_config_get_cf_ros_showimage())
+        {
+            cv::imshow("left",img_left_);
+            cv::imshow("right",img_right_);        
+            cv::waitKey(1);
+        }
+        
+        
+        
+        
         delete img_lr_pkg->left_img;
         delete img_lr_pkg->right_img;
         delete img_lr_pkg;

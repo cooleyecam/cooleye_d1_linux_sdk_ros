@@ -38,6 +38,8 @@ int ce_config_get_cf_img_HB();
 int ce_config_get_cf_img_VB();
 double ce_config_get_cf_img_time_offset();
 
+int ce_config_get_cf_ros_showimage();
+
 
 void  ce_config_rst_imu_offset(void);
 void  ce_config_rewrite_imu_offset(std::string filepath, float *gyro_offs, float *accel_offs, float **accel_T);

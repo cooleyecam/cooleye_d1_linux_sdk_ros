@@ -681,6 +681,7 @@ static void* ce_cam_preprocess(void *)
             
             if( diff_tamps > 0.005 ) 
             {
+                std::cout << "celog: something error the image is no sync!\r\n" << std::endl;
                 if(l_img_pkg->timestamp < r_img_pkg->timestamp )  // give up the early data
                 {
                     img_pkg_left_list.try_pop(l_img_pkg);

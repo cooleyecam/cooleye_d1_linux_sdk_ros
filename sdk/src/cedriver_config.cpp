@@ -296,8 +296,10 @@ void ce_config_load_settings(const char* settings_file)
     std::cout << "cf_imu_icm20689_acc_T[2][1]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[2][1] <<std::endl;
     std::cout << "cf_imu_icm20689_acc_T[2][2]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[2][2] <<std::endl;
 
-
-
+    
+    gc_camd1.gc_ros.cf_ros_showimage = ce_config_get_cf_int_para(&settingsList, "cf_ros_showimage");
+    std::cout << "cf_ros_showimage: " << gc_camd1.gc_ros.cf_ros_showimage <<std::endl;
+    
     ce_config_get_img_config();
 }
 
@@ -478,4 +480,4 @@ int ce_config_get_cf_img_HB(){ return gc_camd1.gc_img.cf_img_HB; }
 int ce_config_get_cf_img_VB(){ return gc_camd1.gc_img.cf_img_VB; }
 double ce_config_get_cf_img_time_offset(){ return gc_camd1.gc_img.cf_img_time_offset; }
 
-
+int ce_config_get_cf_ros_showimage(){ return gc_camd1.gc_ros.cf_ros_showimage; }

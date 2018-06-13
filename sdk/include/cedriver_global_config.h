@@ -143,12 +143,22 @@ typedef struct
     double cf_img_time_offset;
 }global_img_config;
 
+
+typedef struct
+{
+    int cf_ros_showimage;
+}global_ros_config;
+
 typedef struct
 {
     global_dev_config   gc_dev;
     global_cam_config   gc_cam;
     global_imu_config   gc_imu;
     global_img_config   gc_img;
+    global_ros_config   gc_ros;
 }global_config_d1;
+
+
+
 
 #endif

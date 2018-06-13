@@ -312,6 +312,52 @@ kalibr_calibrate_imu_camera --bag imu2cam.bag \
  imu的参数需要通过yaml文件输入给算法。
 
 
+#### 2.2.3 kalibr标定demo
+首先,ros环境下运行起相机
+```
+roscore
+
+rosrun cooleye_d1 CEROS_CAM_D1_NODE ~/src/cooleye_d1_linux_sdk_ros/ros/src/cooleye_d1/config/cecfg_std.txt
+```
+可使用ros命令观察相机运行状态
+```
+rostopic hz /imu0_icm20689 /cooleyed1/left/image_raw /cooleyed1/right/image_raw
+```
+
+config/cecfg_std.txt 文件中的cf_ros_showimage参数可控制ROS是否显示图像.如果需要显示图像, 将该参数置1即可.如不需要显示,可设置为0.默认设置为1.
+```
+cf_ros_showimage=1;
+```
+运行ROS命令,采集一些图像数据.
+```
+rosbag record /cooleyed1/left/image_raw /cooleyed1/right/image_raw 
+```
+运行record命令后,系统即开始记录采集到的图像,这时可以拿出标定板对着镜头晃了,规则与ROS下标定相同.参考章节 __2.1.5 移动棋盘格__ 
+
+然后就可以启动kalibr命令进行标定了
+```
+kalibr_calibrate_cameras --models pinhole-radtan pinhole-radtan \
+	--target checkerboard_11x8_3x3cm.yaml\
+	--bag Num-18040301-2018-05-06-21-21-34.bag \
+	--topics /cooleyed1/left/image_raw /cooleyed1/right/image_raw
+```
+等一会,程序运行完成后即可获得标定结果.
+
+如果还需要继续标定imu.可在完成相机标定后,使用如下命令,同时记录IMU数据和图像数据.
+记录时,保持标定板静止,移动相机,尽量激活IMU的XYZ3个轴.
+将命令中的文件替换为自己的文件名称即可.
+运行算法后可的到IMU与相机的标定结果.
+```
+rosbag record /imu0_icm20689 /camera/left/image_raw  /camera/right/image_raw 
+
+kalibr_calibrate_imu_camera --bag 2018-05-09-23-55-02.bag \
+	--cam camchain-2018-05-06-21-35-46.yaml \
+	--imu imu0_icm20689.yaml \
+	--target checkerboard_11x8_3x3cm.yaml \
+	--time-calibration
+```
+
+
 -------------------------------------------------------------------------------------------------
 
 ## 3. 运行算法相关
