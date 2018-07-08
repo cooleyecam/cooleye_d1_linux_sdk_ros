@@ -338,8 +338,6 @@ static void *ce_cam_capture(void *pUserPara)
 {
     int camlr = *(int *)pUserPara;
     
-    LOG("celog: camlr = %d !\r\n",camlr);
-
     ce_cam_set_mt9v034_config_default(camlr);
  
     ce_cam_set_mt9v034_fps(camlr);
