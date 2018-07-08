@@ -153,20 +153,18 @@ static void ce_config_get_img_config()
     if(gc_camd1.gc_cam.cf_cam_FPS < 10)
     {
         gc_camd1.gc_cam.cf_cam_FPS = 10;
-        gc_camd1.gc_img.cf_img_HB = 0x01FF;
+        gc_camd1.gc_img.cf_img_HB = 0x03FF;
     }
-    else if(gc_camd1.gc_cam.cf_cam_FPS < 19)
+    else if(gc_camd1.gc_cam.cf_cam_FPS < 30)
+        gc_camd1.gc_img.cf_img_HB = 0x03FF;
+    else if(gc_camd1.gc_cam.cf_cam_FPS < 40)
         gc_camd1.gc_img.cf_img_HB = 0x01FF;
-    else if(gc_camd1.gc_cam.cf_cam_FPS < 23)
-        gc_camd1.gc_img.cf_img_HB = 0x00FF;
-    else if(gc_camd1.gc_cam.cf_cam_FPS < 26)
-        gc_camd1.gc_img.cf_img_HB = 0x008F;
-    else if(gc_camd1.gc_cam.cf_cam_FPS < 28)
-        gc_camd1.gc_img.cf_img_HB = 0x004F;
+    else if(gc_camd1.gc_cam.cf_cam_FPS < 45)
+        gc_camd1.gc_img.cf_img_HB = 0x0160;
     else
     {
-        gc_camd1.gc_cam.cf_cam_FPS = 27;
-        gc_camd1.gc_img.cf_img_HB = 0x004F;
+        gc_camd1.gc_cam.cf_cam_FPS = 45;
+        gc_camd1.gc_img.cf_img_HB = 0x0160;
     }
 
 
@@ -174,7 +172,7 @@ static void ce_config_get_img_config()
     // A = cf_img_width    Q =  cf_img_VB  = reg05
     gc_camd1.gc_img.cf_img_VB = (CAMD1_SYS_CLKIN/gc_camd1.gc_cam.cf_cam_FPS - 4)/(gc_camd1.gc_img.cf_img_width + gc_camd1.gc_img.cf_img_HB) - gc_camd1.gc_img.cf_img_height;
 
-
+    std::cout << "cf_img_VB_old: " << gc_camd1.gc_img.cf_img_VB <<std::endl;
     if(gc_camd1.gc_img.cf_img_VB < 0x2D)
         gc_camd1.gc_img.cf_img_VB = 0x2D;
 

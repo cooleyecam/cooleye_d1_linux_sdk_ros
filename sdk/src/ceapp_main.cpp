@@ -31,22 +31,23 @@ int main(int argc, char* argv[])
 
     ce_config_load_settings("../config/cecfg_std.txt");
 
-    int fd = ce_imu_capture_init();
-    if(fd < 0)
-    {
-        printf("celog: imu caputre error\r\n");
-    }
+//     int fd = ce_imu_capture_init();
+//     if(fd < 0)
+//     {
+//         printf("celog: imu caputre error\r\n");
+//     }
+// 
+//     else
+//     {
+//         printf("celog: imu caputre success\r\n");
+// 
+//         fd = ce_imu_showdata_init();
+//         if(fd < 0)
+//             printf("celog: imu show data error\r\n");
+//         else
+//             printf("celog: imu show data success\r\n");
+//     }
 
-    else
-    {
-        printf("celog: imu caputre success\r\n");
-
-        fd = ce_imu_showdata_init();
-        if(fd < 0)
-            printf("celog: imu show data error\r\n");
-        else
-            printf("celog: imu show data success\r\n");
-    }
 
     int r = ce_cam_capture_init();
     if(r < 0)

@@ -496,7 +496,7 @@ static void* ce_imu_showdata(void *)
         }
 
 
-//         std::cout << "stamp :" << std::setprecision(15)<< ticm20689_pkg->timestamp << std::endl;
+         std::cout << "stamp :" << std::setprecision(15)<< ticm20689_pkg->timestamp << std::endl;
 //         std::cout << "Acc X :" << ticm20689_pkg->ax << std::endl;
 //         std::cout << "Acc Y :" << ticm20689_pkg->ay << std::endl;
 //         std::cout << "Acc Z :" << ticm20689_pkg->az << std::endl;

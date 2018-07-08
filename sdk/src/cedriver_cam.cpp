@@ -112,49 +112,14 @@ static int ce_cam_i2c_write(int cam_num, unsigned char reg,int value)
     return r;
 }
 
-static void ce_cam_set_mt9v034_default(int camlr)
-{
-    /*every reg you have changed should be set to dfault here;*/
-    ce_cam_i2c_write(camlr,0x00,0x1324);
-    ce_cam_i2c_write(camlr,0x01,0x0001);
-    ce_cam_i2c_write(camlr,0x02,0x0004);
-    ce_cam_i2c_write(camlr,0x03,0x01E0);
 
-    ce_cam_i2c_write(camlr,0x04,0x02F0);
-    ce_cam_i2c_write(camlr,0x05,0x005E);
-    ce_cam_i2c_write(camlr,0x06,0x002D);
-    ce_cam_i2c_write(camlr,0x07,0x0388);
-
-
-    ce_cam_i2c_write(camlr,0x0B,0x01E0);
-    ce_cam_i2c_write(camlr,0x35,0x0010);
-    ce_cam_i2c_write(camlr,0xA5,0x003A);
-    ce_cam_i2c_write(camlr,0xA6,0x0002);
-
-    ce_cam_i2c_write(camlr,0xA8,0x0000);
-    ce_cam_i2c_write(camlr,0xA9,0x0002);
-    ce_cam_i2c_write(camlr,0xAA,0x0002);
-    ce_cam_i2c_write(camlr,0xAB,0x0040);
-
-    ce_cam_i2c_write(camlr,0xAC,0x0001);
-    ce_cam_i2c_write(camlr,0xAD,0x01E0);
-    ce_cam_i2c_write(camlr,0xAE,0x0014);
-    ce_cam_i2c_write(camlr,0xAF,0x0003);
-
-    /*recommended register setting and performance impact   PDF-page14*/
-    ce_cam_i2c_write(camlr,0x20,0x03C7);
-    ce_cam_i2c_write(camlr,0x24,0x001B);
-    ce_cam_i2c_write(camlr,0x2B,0x0003);
-    ce_cam_i2c_write(camlr,0x2F,0x0003);
-}
 
 static int ce_cam_set_af_mode(int camlr)
 {
     if(CAMD1_LEFT == camlr)
-        ce_cam_i2c_write(camlr,0x70,0x0303);
+        ce_cam_i2c_write(camlr,0xAF,0x0303);
     else if(CAMD1_RIGHT == camlr)
-        ce_cam_i2c_write(camlr,0x70,0x0000);
-      //  ce_cam_i2c_write(camlr,0x70,0x0303);
+        ce_cam_i2c_write(camlr,0xAF,0x0303);
     else
     {
         LOG("celog: Wrong cam number!\r\n");
@@ -245,7 +210,7 @@ static int ce_cam_sync_rst_bulk(int camlr)
 
 static void ce_cam_set_mt9v034_config_default(int camlr)
 {
-    ce_cam_i2c_write(camlr,0x07,0x0388);
+    ce_cam_i2c_write(camlr,0x07,0x0188);
 
     // CONTEXT A
     ce_cam_i2c_write(camlr,0x04,0x02F0);    // 720X480
@@ -277,7 +242,7 @@ static void ce_cam_set_mt9v034_config_default(int camlr)
     
     
     
-    ce_cam_i2c_write(camlr,0x70,0x0000);
+    ce_cam_i2c_write(camlr,0x70,0x0303);
     
     ce_cam_set_af_mode(camlr);
     
@@ -287,6 +252,7 @@ static void ce_cam_set_mt9v034_config_default(int camlr)
     ce_cam_i2c_write(camlr,0xAB,0x0040);
     ce_cam_i2c_write(camlr,0xB0,0xFFFF);    
     ce_cam_i2c_write(camlr,0xA5,0x0037);
+    ce_cam_i2c_write(camlr,0x1C,0x0202);
     ce_cam_i2c_write(camlr,0x7F,0x0000);    
     ce_cam_i2c_write(camlr,0xA6,0x0001);
     ce_cam_i2c_write(camlr,0xA8,0x0000);

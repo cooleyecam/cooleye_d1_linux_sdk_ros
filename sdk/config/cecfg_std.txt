@@ -41,15 +41,15 @@ cf_imu_icm20689_sample_rate=1000;
 cf_cam_mode=3;
 #VGA = 1  WVGA = 2
 cf_cam_resolution=2;
-# FPS: 1~27 is option.
-cf_cam_FPS=27;
+# FPS: 1~45 is option.
+cf_cam_FPS=45;
 ##EG_MODE
 #  0 :  Manual mode
 #  1 : AEC/AGC mode
 #  2 : AEC / Manual Gain
 #  3 : default and do nothing
 #  4 : just set skip frame
-cf_cam_EG_mode=0;
+cf_cam_EG_mode=1;
 # 0 : Manual mode #######
 cf_cam_man_exp=200;
 cf_cam_man_gain=50;
