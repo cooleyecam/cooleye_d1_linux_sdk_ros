@@ -337,7 +337,8 @@ static void ce_cam_set_mt9v034_EG_mode(int camlr)
 static void *ce_cam_capture(void *pUserPara)
 {
     int camlr = *(int *)pUserPara;
-        
+    
+    LOG("celog: camlr = %d !\r\n",camlr);
 
     ce_cam_set_mt9v034_config_default(camlr);
  
@@ -517,13 +518,9 @@ int ce_cam_capture_init()
     else
     {
         int temp=0;
-        int caml_addr = 0; 
-        int camr_addr = 0;
-        
-        caml_addr = CAMD1_LEFT;
-        camr_addr = CAMD1_RIGHT;
+        static int caml_addr = CAMD1_LEFT; 
+        static int camr_addr = CAMD1_RIGHT;
 
-  
         ce_cam_get_soft_version(caml_addr);
         ce_cam_get_soft_version(camr_addr);
 
