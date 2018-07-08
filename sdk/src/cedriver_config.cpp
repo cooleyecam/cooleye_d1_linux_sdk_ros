@@ -155,9 +155,9 @@ static void ce_config_get_img_config()
         gc_camd1.gc_cam.cf_cam_FPS = 10;
         gc_camd1.gc_img.cf_img_HB = 0x03FF;
     }
-    else if(gc_camd1.gc_cam.cf_cam_FPS < 30)
+    else if(gc_camd1.gc_cam.cf_cam_FPS < 31)
         gc_camd1.gc_img.cf_img_HB = 0x03FF;
-    else if(gc_camd1.gc_cam.cf_cam_FPS < 40)
+    else if(gc_camd1.gc_cam.cf_cam_FPS < 41)
         gc_camd1.gc_img.cf_img_HB = 0x01FF;
     else if(gc_camd1.gc_cam.cf_cam_FPS < 45)
         gc_camd1.gc_img.cf_img_HB = 0x0160;

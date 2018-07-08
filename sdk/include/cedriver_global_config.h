@@ -56,10 +56,6 @@
 #define CAMD1_RIGHT_ENABLE   0x02
 
 
-#define IMG_LOW_SPEED_HB      0x01FF
-#define IMG_HIGH_SPEED_HB     0x00FF
-
-
 
 /*PARAMETER MACRO*/
 #define IMG_WIDTH_VGA   640
