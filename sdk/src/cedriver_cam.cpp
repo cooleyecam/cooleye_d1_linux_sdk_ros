@@ -61,6 +61,7 @@ static libusb_device_handle* ce_cam_get_cam_handle(int cam_num)
     else
     {
         LOG("celog: Wrong cam number!\r\n");
+        LOG("celog: cam_num = %d \r\n",cam_num);
         return NULL;
     }
 }
@@ -130,20 +131,7 @@ static int ce_cam_set_af_mode(int camlr)
 }
 
 
-static int ce_cam_set_master_slave_mode(int camlr)
-{
-    if(CAMD1_LEFT == camlr)
-        ce_cam_i2c_write(camlr,0x07,0x0088);
-    else if(CAMD1_RIGHT == camlr)
-        ce_cam_i2c_write(camlr,0x07,0x0080);
-    else
-    {
-        LOG("celog: Wrong cam number!\r\n");
-        return ERROR;
-    }
 
-    return SUCCESS;
-}
 
 static int ce_cam_sync_rst(int camlr)
 {
@@ -210,8 +198,10 @@ static int ce_cam_sync_rst_bulk(int camlr)
 
 static void ce_cam_set_mt9v034_config_default(int camlr)
 {
+    
+    usleep(10000);
     ce_cam_i2c_write(camlr,0x07,0x0188);
-
+ 
     // CONTEXT A
     ce_cam_i2c_write(camlr,0x04,0x02F0);    // 720X480
     ce_cam_i2c_write(camlr,0x03,0x01E0);
@@ -281,11 +271,15 @@ static void ce_cam_set_mt9v034_config_default(int camlr)
     ce_cam_i2c_write(camlr,0xAD,0x01E0);
     ce_cam_i2c_write(camlr,0xAB,0x0040);
     
-    /*recommended register setting and performance impact   PDF-page14*/
-    ce_cam_i2c_write(camlr,0x20,0x03C7);
-    ce_cam_i2c_write(camlr,0x24,0x001B);
-    ce_cam_i2c_write(camlr,0x2B,0x0003);
-    ce_cam_i2c_write(camlr,0x2F,0x0003);
+//     ce_cam_i2c_write(camlr,0x72,0x0010);
+//     /*recommended register setting and performance impact   PDF-page14*/
+// 
+//     ce_cam_i2c_write(camlr,0x20,0x03C7);
+//     ce_cam_i2c_write(camlr,0x24,0x001B);
+//     ce_cam_i2c_write(camlr,0x2B,0x0003);
+//     ce_cam_i2c_write(camlr,0x2F,0x0003);
+
+    
 }
 
 
@@ -343,14 +337,15 @@ static void ce_cam_set_mt9v034_EG_mode(int camlr)
 static void *ce_cam_capture(void *pUserPara)
 {
     int camlr = *(int *)pUserPara;
-    
-    ce_cam_set_mt9v034_config_default(camlr);
+        
 
+    ce_cam_set_mt9v034_config_default(camlr);
+ 
     ce_cam_set_mt9v034_fps(camlr);
     
     ce_cam_set_mt9v034_EG_mode(camlr);
 
-    ce_cam_ctrl_camera(camlr,SET_MCLK_12MHz);
+    ce_cam_ctrl_camera(camlr,SET_MCLK_48MHz);
 
     usleep(1000);
 
@@ -418,7 +413,7 @@ static void *ce_cam_capture(void *pUserPara)
             timg_pkg = NULL;
             LOG("cam %d bulk transfer check failed: %d\n",camlr,r);
             
-            ce_cam_ctrl_camera(camlr,SET_MCLK_12MHz);
+            ce_cam_ctrl_camera(camlr,SET_MCLK_48MHz);
         }
     }
 
@@ -522,17 +517,20 @@ int ce_cam_capture_init()
     else
     {
         int temp=0;
-        int caml_addr = CAMD1_LEFT;
-        int camr_addr = CAMD1_RIGHT;
+        int caml_addr = 0; 
+        int camr_addr = 0;
+        
+        caml_addr = CAMD1_LEFT;
+        camr_addr = CAMD1_RIGHT;
 
   
         ce_cam_get_soft_version(caml_addr);
         ce_cam_get_soft_version(camr_addr);
 
         
-        
         if(ce_config_get_cf_cam_mode()& CAMD1_LEFT_ENABLE)
         {
+
             temp = pthread_create(&ce_camd1l_capture_thread, NULL, ce_cam_capture, &caml_addr);
             if(temp)
             {

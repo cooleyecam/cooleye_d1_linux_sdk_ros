@@ -69,7 +69,7 @@
 #define FRAME_CLUST 54
 
 /*CAMERA CONTROL INSTRUCTION MACRO*/
-#define SET_MCLK_12MHz      0xA1
+#define SET_MCLK_48MHz      0xA1
 #define SET_MCLK_24MHz      0xA2
 #define STANDBY_SHORT       0xA3
 #define STANDBY_LONG        0xA4

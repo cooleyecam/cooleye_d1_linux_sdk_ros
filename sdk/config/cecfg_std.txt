@@ -42,7 +42,7 @@ cf_cam_mode=3;
 #VGA = 1  WVGA = 2
 cf_cam_resolution=2;
 # FPS: 1~45 is option.
-cf_cam_FPS=20;
+cf_cam_FPS=45;
 ##EG_MODE
 #  0 :  Manual mode
 #  1 : AEC/AGC mode
@@ -51,7 +51,7 @@ cf_cam_FPS=20;
 #  4 : just set skip frame
 cf_cam_EG_mode=0;
 # 0 : Manual mode #######
-cf_cam_man_exp=200;
+cf_cam_man_exp=400;
 cf_cam_man_gain=50;
 # 1 : AEC/AGC mode#########
 cf_cam_auto_EG_top=200;
