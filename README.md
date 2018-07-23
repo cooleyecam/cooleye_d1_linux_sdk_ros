@@ -1,7 +1,22 @@
 # CoolEye D1 Linux SDK & ROS 
-### Version 0.2
+### Version 0.3
 本项目包括CoolEye D1 相机运行所需的必备文件,为了便于用于学习和使用,内容全部开源。
 主流的SLAM算法,图像拼接,智能识别等功能会陆续放出。
+
+-------------------------------------------------------------------------------------------------
+##主要参数介绍
+
+- CMOS 1/3'' :  灰度图像(Mono)
+- 快门模式 : 全局快门(global shutter)
+- 同步方式 : 双目同步曝光
+- 分辨率 : 最大752x480
+- 帧率 : 双目45帧
+- 视场角 : D/H/V = 140/120/75
+- 双目基线长 : 120mm
+- 输出格式 : RAW/畸变矫正图/视察图/XYZ点云图
+- 深度范围 : 0.2m - 10米左右
+- IMU输出 : ACC / GYRO 原始数据,帧率最大1K
+- 接口类型 : USB2.0
 
 -------------------------------------------------------------------------------------------------
 
@@ -14,11 +29,32 @@
 
 
 __首先需要安装opencv__
-建议使用3.2.0或3.4.0版本。
+建议使用3.4.0版本。
 参考文档：
 ```
 https://blog.csdn.net/u013066730/article/details/79411767
 ```
+另视差图的计算,用到了opencv得扩展库.
+请安装opencv_contrib,推荐使用3.4.0(与opencv同版本).
+
+```
+cd ~/src
+git clone https://github.com/opencv/opencv_contrib/tree/3.4.0
+```
+建议进入opencv_contrib目录,将需要用到cuda的库文件直接删除,以便编译顺利.
+```
+cd  ~/src/opencv_contrib-3.4.0/modules
+rm -rf xfeatures2d
+```
+进入opencv编译目录,重新执行cmake并编译.
+_<opencv_contrib>/modules__  建议使用绝对路径,
+```
+$ cd <opencv_build_directory>
+$ cmake -DOPENCV_EXTRA_MODULES_PATH=<opencv_contrib>/modules <opencv_source_directory>
+$ make
+$ sudo make install
+```
+至此,opencv和opencv_contrib安装完毕.
 
 ### 1.1 SDK安装方法
 为了便于用户一次成功，介绍时将使用绝对使用路径。
@@ -45,17 +81,45 @@ make
 
 ```
 	
-编译将生成2个文件：
-- CEAPP_MAIN : 运行即可直接显示相机输出。如果log没有IMU数据,说明串口没有正常打开,如果没有看到图像,很有可能是OPENCV没有正确安装.
+编译将生成6个文件：
+- CEAPP_RAW_DATA : 运行即可直接显示相机输出。如果log没有IMU数据,说明串口没有正常打开,如果没有看到图像,很有可能是OPENCV没有正确安装.
 ```	
-./CEAPP_MAIN 
+./CEAPP_RAW_DATA 
 ```
-- CEAPP_CALI_IMU : 用于校准相机自带的IMU的初始偏移。这个六面矫正法移植自PX4的飞控固件，用起来比较麻烦，但是效果还可以，在发布自动矫正的软件版本之前，先临时用来修正IMU的误差。
-运行后根据操作，程序会自己将计算出的误差写入配置文件中，用户无需操作。
 
+
+- CETOOL_CALI_IMU : 用于校准相机自带的IMU的初始偏移。这个六面矫正法移植自PX4的飞控固件，用起来比较麻烦，但是效果还可以，在发布自动矫正的软件版本之前，先临时用来修正IMU的误差。
+运行后根据操作，程序会自己将计算出的误差写入配置文件中，用户无需操作。
 ```	
-./CEAPP_CALI_IMU
+./CETOOL_CALI_IMU
 ```
+
+
+
+- CETOOL_STEREO_CAPTURE_IMG : 由于本相机使用得镜头视角很大,使用opencv自带得棋盘格标定并不容易得到正确得参数.因此需要使用鱼眼(fisheye)标定,本程序即为标定采集所需图像得程序,运行后用标定版对着摄像头,即可看到棋盘格是否正确识别,每敲一个回车,可保存一帧当前图像,
+```	
+./CETOOL_STEREO_CAPTURE_IMG
+```
+
+
+
+- CETOOL_CALI_STEREO_CAL : 采集完包含棋盘格得图像后,可调用本程序进行计算.内参和外参文件会直接放入config目录下.
+```	
+./CETOOL_STEREO_CAPTURE_IMG
+```
+
+
+- CEAPP_STEREO_MATCH : 运行即可调用config目录下的相机内参和外参,并输出视差图, 此程序输出得视差图没有进行后滤波处理.用于调试BM和SGM得算法参数.
+```	
+./CEAPP_STEREO_MATCH 
+```
+
+
+- CEAPP_DISP_FILTER : 运行即可输出经过后滤波得视差图.因为滤波算法尚未整合到opencv,因此需要安装扩展包opencv_contrib,如果安装不正确,则此程序无法正常编译. 本程序同要需要调用config目录下的相机内参和外参.
+```	
+./CEAPP_DISP_FILTER 
+```
+
 
 ### 1.2 ROS环境安装方法
 在这之前请先根据ros官网安装kinetic版本,建议使用kinetic版本.其他的版本在后续使用算法时可能会有些兼容问题.请先安装完
@@ -611,6 +675,7 @@ ${PROJECT_SOURCE_DIR}/../../../lib/libboost_system.so
 - 2018-06-03手册首次发布
 - 2018-06-08增加相机升级教程，kalibr的安装教程，常见问题汇总
 - 2018-06-12增加okvis算法的安装
+- 2018-07-03增加视差输出,畸变矫正输出,增加iopencv鱼眼标定程序
 
 
 
