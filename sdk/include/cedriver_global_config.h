@@ -145,6 +145,13 @@ typedef struct
     int cf_ros_showimage;
 }global_ros_config;
 
+
+typedef struct
+{
+    int cf_ste_algorithm;
+}global_ste_config;
+
+
 typedef struct
 {
     global_dev_config   gc_dev;
@@ -152,6 +159,8 @@ typedef struct
     global_imu_config   gc_imu;
     global_img_config   gc_img;
     global_ros_config   gc_ros;
+    global_ste_config   gc_ste;
+    
 }global_config_d1;
 
 

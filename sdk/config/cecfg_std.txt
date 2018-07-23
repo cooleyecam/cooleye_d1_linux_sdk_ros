@@ -42,17 +42,17 @@ cf_cam_mode=3;
 #VGA = 1  WVGA = 2
 cf_cam_resolution=2;
 # FPS: 1~45 is option.
-cf_cam_FPS=45;
+cf_cam_FPS=30;
 ##EG_MODE
 #  0 :  Manual mode
 #  1 : AEC/AGC mode
 #  2 : AEC / Manual Gain    
 #  3 : default and do nothing
 #  4 : just set skip frame
-cf_cam_EG_mode=0;
+cf_cam_EG_mode=1;
 # 0 : Manual mode #######
-cf_cam_man_exp=400;
-cf_cam_man_gain=50;
+cf_cam_man_exp=50;
+cf_cam_man_gain=25;
 # 1 : AEC/AGC mode#########
 cf_cam_auto_EG_top=200;
 cf_cam_auto_EG_bottom=5;
@@ -68,3 +68,10 @@ cf_cam_agc_aec_skip_frame=0;
 #####################################
 cf_ros_showimage=1;
 #####################################
+#stereo_match_algorithm
+#STEREO_BM=0
+#STEREO_SGBM=1
+#STEREO_HH=2
+#STEREO_3WAY=4
+###################################
+cf_ste_algorithm=0;

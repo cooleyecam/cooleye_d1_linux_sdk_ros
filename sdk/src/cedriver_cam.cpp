@@ -404,6 +404,7 @@ static void *ce_cam_capture(void *pUserPara)
             {
                 delete timg_pkg_giveup;
             }
+                    
 
         }
         else
@@ -414,6 +415,16 @@ static void *ce_cam_capture(void *pUserPara)
             
             ce_cam_ctrl_camera(camlr,SET_MCLK_48MHz);
         }
+    }
+    
+    
+    if(CAMD1_LEFT == camlr)
+    {
+        ce_camd1l_capture_thread = 0;
+    }
+    else if(CAMD1_RIGHT == camlr)
+    {
+        ce_camd1r_capture_thread = 0;
     }
 
     pthread_exit(NULL);
@@ -550,10 +561,9 @@ int ce_cam_capture_init()
 }
 
 void ce_cam_capture_close()
-{
+{   
     ce_cam_capture_stop_run=true;
-
-
+    usleep(100);
     if(ce_camd1l_capture_thread !=0)
     {
         pthread_join(ce_camd1l_capture_thread,NULL);
@@ -582,18 +592,34 @@ static void* ce_cam_showimg(void *)
 
 
         memcpy(img_left.data, img_lr_pkg->left_img->data, ce_config_get_cf_img_size());
-        cv::imshow("left",img_left);
+        //cv::imshow("left",img_left);
         std::cout << "left tamps:" << std::setprecision(15) << img_lr_pkg->left_img->timestamp << std::endl;
 
         memcpy(img_right.data,img_lr_pkg->right_img->data,ce_config_get_cf_img_size());
-        cv::imshow("right",img_right);
+        //cv::imshow("right",img_right);
         std::cout << "right tamps:" << std::setprecision(15) << img_lr_pkg->right_img->timestamp << std::endl;
+        
+        
+        
+        cv::Mat result(img_left.rows, 
+                   img_left.cols + img_right.cols, 
+                   img_left.type());
+ 
+        
+
+        img_left.colRange( 0, img_left.cols).copyTo(result.colRange(0, img_left.cols));
+ 
+        img_right.colRange( 0, img_right.cols).copyTo(result.colRange(img_left.cols, result.cols));
+        cv::imshow("result",result);
+        
         cv::waitKey(1);
 
         delete img_lr_pkg->left_img;
         delete img_lr_pkg->right_img;
         delete img_lr_pkg;
     }
+    
+    ce_cam_showimg_thread = 0;
     pthread_exit(NULL);
 }
 
@@ -610,13 +636,14 @@ int ce_cam_showimg_init()
 }
 
 void ce_cam_showimg_close()
-{
+{    
     ce_cam_showimg_stop_run = true;
+    usleep(100);
+    
     if(ce_cam_showimg_thread != 0)
     {
         pthread_join(ce_cam_showimg_thread,NULL);
-    }
-
+    }    
 }
 
 static void* ce_cam_preprocess(void *)

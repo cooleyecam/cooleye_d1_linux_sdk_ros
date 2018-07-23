@@ -298,6 +298,9 @@ void ce_config_load_settings(const char* settings_file)
     gc_camd1.gc_ros.cf_ros_showimage = ce_config_get_cf_int_para(&settingsList, "cf_ros_showimage");
     std::cout << "cf_ros_showimage: " << gc_camd1.gc_ros.cf_ros_showimage <<std::endl;
     
+    gc_camd1.gc_ros.cf_ros_showimage = ce_config_get_cf_int_para(&settingsList, "cf_ste_algorithm");
+    std::cout << "cf_ste_algorithm: " << gc_camd1.gc_ste.cf_ste_algorithm <<std::endl;
+    
     ce_config_get_img_config();
 }
 
@@ -385,15 +388,15 @@ void  ce_config_rewrite_imu_offset(std::string filepath, float *gyro_offs, float
     std::cout << "cf_imu_icm20689_acc_T[2][1]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[2][1] <<std::endl;
     std::cout << "cf_imu_icm20689_acc_T[2][2]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[2][2] <<std::endl;
 
-    std::cout << "1----------------------------------------------------"<<std::endl;
+
     ce_config_set_cf_float_para(filepath,"cf_imu_icm20689_acc_bias_X",gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_X);
     ce_config_set_cf_float_para(filepath,"cf_imu_icm20689_acc_bias_Y",gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_Y);
     ce_config_set_cf_float_para(filepath,"cf_imu_icm20689_acc_bias_Z",gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_Z);
-     std::cout << "2----------------------------------------------------"<<std::endl;
+
     ce_config_set_cf_float_para(filepath,"cf_imu_icm20689_gyro_bias_X",gc_camd1.gc_imu.cf_imu_icm20689_gyro_bias_X);
     ce_config_set_cf_float_para(filepath,"cf_imu_icm20689_gyro_bias_Y",gc_camd1.gc_imu.cf_imu_icm20689_gyro_bias_Y);
     ce_config_set_cf_float_para(filepath,"cf_imu_icm20689_gyro_bias_Z",gc_camd1.gc_imu.cf_imu_icm20689_gyro_bias_Z);
-     std::cout << "3----------------------------------------------------"<<std::endl;
+    
     ce_config_set_cf_float_para(filepath, "cf_imu_icm20689_acc_T[0][0]",gc_camd1.gc_imu.cf_imu_icm20689_acc_T[0][0]);
     ce_config_set_cf_float_para(filepath, "cf_imu_icm20689_acc_T[0][1]",gc_camd1.gc_imu.cf_imu_icm20689_acc_T[0][1]);
     ce_config_set_cf_float_para(filepath, "cf_imu_icm20689_acc_T[0][2]",gc_camd1.gc_imu.cf_imu_icm20689_acc_T[0][2]);
@@ -479,3 +482,5 @@ int ce_config_get_cf_img_VB(){ return gc_camd1.gc_img.cf_img_VB; }
 double ce_config_get_cf_img_time_offset(){ return gc_camd1.gc_img.cf_img_time_offset; }
 
 int ce_config_get_cf_ros_showimage(){ return gc_camd1.gc_ros.cf_ros_showimage; }
+
+int ce_config_get_cf_ste_algorithm(){ return gc_camd1.gc_ste.cf_ste_algorithm; }

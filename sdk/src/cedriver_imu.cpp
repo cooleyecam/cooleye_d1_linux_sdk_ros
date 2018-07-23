@@ -321,15 +321,21 @@ void *ce_imu_data_feed(void*)
     
     tcflush(ce_imu_uart_fd, TCIFLUSH);
     while(!ce_imu_capture_stop_run)
-    {
-        
+    {        
         start_time = getIMUTime.tv_sec + 0.000001 * getIMUTime.tv_usec;
 
         while(num_get < IMU_FRAME_LEN)
         {
             int temp_read_get = read(ce_imu_uart_fd, &imu_frame_buf[num_get], IMU_FRAME_LEN);
+            if (0 >= temp_read_get)
+            {
+                break;
+            }
             num_get += temp_read_get;
         }
+        
+        if (0 == num_get)
+            continue;
         
         //std::cout << "start_time :"<< std::setprecision(15)  << start_time <<std::endl;
         gettimeofday(&getIMUTime, NULL);
@@ -420,14 +426,14 @@ void *ce_imu_data_feed(void*)
         {
             delete icm20689_giveup;
             icm20689_giveup = NULL;
-        }
-
-
+        }    
+        
         memset(imu_frame_buf, 0, 2*IMU_FRAME_LEN);
         num_get = 0;
 
     }
 
+    ce_imu_capture_thread = 0;
     pthread_exit(NULL);
 }
 
@@ -477,7 +483,8 @@ int ce_imu_capture_init()
 void ce_imu_capture_close()
 {
     ce_imu_capture_stop_run = true;
-
+    usleep(10000);
+    
     if(ce_imu_capture_thread !=0)
     {
         pthread_join(ce_imu_capture_thread, NULL);
@@ -496,7 +503,7 @@ static void* ce_imu_showdata(void *)
         }
 
 
-         std::cout << "stamp :" << std::setprecision(15)<< ticm20689_pkg->timestamp << std::endl;
+         std::cout << "imu_stamp :" << std::setprecision(15)<< ticm20689_pkg->timestamp << std::endl;
 //         std::cout << "Acc X :" << ticm20689_pkg->ax << std::endl;
 //         std::cout << "Acc Y :" << ticm20689_pkg->ay << std::endl;
 //         std::cout << "Acc Z :" << ticm20689_pkg->az << std::endl;
@@ -505,18 +512,19 @@ static void* ce_imu_showdata(void *)
 //         std::cout << "Gyr Y :" << ticm20689_pkg->ry << std::endl;
 //         std::cout << "Gyr Z :" << ticm20689_pkg->rz << std::endl;
 
-      MadgwickAHRSupdateIMU( 3.1415926f * ticm20689_pkg->rx / 180.0f,
-                            3.1415926f * ticm20689_pkg->ry / 180.0f,
-                            3.1415926f * ticm20689_pkg->rz / 180.0f,
-                            ticm20689_pkg->ax,
-                            ticm20689_pkg->ay,
-                            ticm20689_pkg->az);
-        
+//       MadgwickAHRSupdateIMU( 3.1415926f * ticm20689_pkg->rx / 180.0f,
+//                             3.1415926f * ticm20689_pkg->ry / 180.0f,
+//                             3.1415926f * ticm20689_pkg->rz / 180.0f,
+//                             ticm20689_pkg->ax,
+//                             ticm20689_pkg->ay,
+//                             ticm20689_pkg->az);
+
         delete ticm20689_pkg;
         ticm20689_pkg = NULL;
 
 
     }
+    ce_imu_showdata_thread = 0;
     pthread_exit(NULL);
 }
 
@@ -532,13 +540,14 @@ int ce_imu_showdata_init()
 }
 
 void ce_imu_showdata_close()
-{
+{    
     ce_imu_showdata_stop_run = true;
-
+    usleep(100);
+    
     if(ce_imu_showdata_thread != 0)
     {
         pthread_join(ce_imu_showdata_thread,NULL);
-    }
+    }    
 }
 
 

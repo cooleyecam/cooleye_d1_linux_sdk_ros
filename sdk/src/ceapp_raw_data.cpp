@@ -5,6 +5,9 @@
 #include <sys/time.h>
 #include <iostream>
 #include <signal.h>
+#include <vector>
+#include <sstream>
+
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
@@ -18,7 +21,6 @@ int g_nCtrl;
 
 void SIGINTHandler(int nSig)
 {
-    printf("capture a SIGINT signal %d\n", nSig);
     if(0 != g_nCtrl)
         g_nCtrl = 0;
     else
@@ -47,7 +49,6 @@ int main(int argc, char* argv[])
         else
             printf("celog: imu show data success\r\n");
     }
-
 
     int r = ce_cam_capture_init();
     if(r < 0)
@@ -80,10 +81,9 @@ int main(int argc, char* argv[])
     {
         sleep(1);
     }
-
-    ce_imu_capture_close();
+    
+    ce_imu_capture_close();     
     ce_imu_showdata_close();
-
     ce_cam_capture_close();
     ce_cam_showimg_close();
     return 0;
