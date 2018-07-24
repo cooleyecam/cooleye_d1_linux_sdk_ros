@@ -31,6 +31,7 @@ bool g_bSaveImg = false;
 pthread_t ce_cali_catch_enter_key_thread;
 bool ce_cali_catch_enter_key_stop_run = false;
 
+
 extern threadsafe_queue<d1_img_output_pkg *> img_pkg_list_d1;
 
 
@@ -84,8 +85,10 @@ void ce_cali_catch_enter_key_close()
 
 static void* ce_cam_capture_calib(void *)
 {
-   
+    ce_config_get_cf_cam_rectify_force_off();
+    
     Size board_size = Size(11,8); 
+    
     cv::Mat img_left(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
     cv::Mat img_right(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
     cv::Mat img_left_corners(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);

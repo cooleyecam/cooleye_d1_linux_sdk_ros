@@ -37,6 +37,7 @@ cf_imu_icm20689_sample_rate=1000;
 ###################################
 #### global_cam_config
 ####
+####
 #mode : left=1;right =2;streoe =3;
 cf_cam_mode=3;
 #VGA = 1  WVGA = 2
@@ -64,6 +65,9 @@ cf_cam_auto_E_man_G=500;
 # 3 : default and do nothing#####
 # 4 : just set skip frame #######
 cf_cam_agc_aec_skip_frame=0;
+#####################################
+## 0 = raw    1= rectify
+cf_cam_rectify=0;
 #####################################
 #####################################
 cf_ros_showimage=1;

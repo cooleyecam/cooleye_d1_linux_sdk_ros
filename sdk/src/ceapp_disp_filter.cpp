@@ -78,6 +78,7 @@ int disp_filter(Mat& mat_Left, Mat& mat_Right, Mat& mat_raw_disp_vis, Mat& mat_f
             wsize = 15; //default window size for BM on full-sized views
     }
 
+    
     //! [load_views]
     Mat left  = mat_Left;
     Mat right = mat_Right;
@@ -257,56 +258,18 @@ int disp_filter(Mat& mat_Left, Mat& mat_Right, Mat& mat_raw_disp_vis, Mat& mat_f
 
 static void* ce_disp_filter(void *)
 {
+    ce_config_get_cf_cam_rectify_force_on();
+    
     cv::Mat img_left(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
     cv::Mat img_right(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
 
-    cv::Mat img_left_remap(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
-    cv::Mat img_right_remap(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
-    
-    
-    
-    Mat M1, D1, M2, D2;
-    Mat R, T, R1, P1, R2, P2 ,Q;
-    Mat l_remapx,l_remapy,r_remapx,r_remapy;
-    Mat xyz;
-    Mat disp8_raw,disp8_filter;
-    Mat disRGB_raw,disRGB_filter;;
-    Mat result_raw;
-    Mat result_filter;
-    
-    FileStorage fs("../config/intrinsics.yml", FileStorage::READ);
-    if(!fs.isOpened())
-    {
-        printf("Failed to open file intrinsic_filename \n");
-    }
-
-    fs["M1"] >> M1;
-    fs["D1"] >> D1;
-    fs["M2"] >> M2;
-    fs["D2"] >> D2;
-
-    fs.open("../config/extrinsics.yml", FileStorage::READ);
-    if(!fs.isOpened())
-    {
-        printf("Failed to open file extrinsic_filename \n");
-    }
-
-    fs["R"] >> R;
-    fs["T"] >> T;
-    
-    fs["R1"] >> R1;
-    fs["R2"] >> R2;
-    fs["P1"] >> P1;
-    fs["P2"] >> P2;
-    fs["Q"] >> Q;
-    
-    
-    fisheye::initUndistortRectifyMap(M1, D1, R1, P1, img_left.size(), CV_16SC2, l_remapx, l_remapy);
-    fisheye::initUndistortRectifyMap(M2, D2, R2, P2, img_right.size(), CV_16SC2, r_remapx, r_remapy);
+    cv::Mat disp8_raw,disp8_filter;
+    cv::Mat disRGB_raw,disRGB_filter;;
+    cv::Mat result_raw;
+    cv::Mat result_filter;
     
     ////////////////////////////////////////////////////////////////////////////////////
 
-    
     d1_img_output_pkg *img_lr_pkg;
 
     while(!ce_disp_filter_stop_run)
@@ -329,20 +292,9 @@ static void* ce_disp_filter(void *)
         memcpy(img_left.data, img_lr_pkg->left_img->data, ce_config_get_cf_img_size());
         memcpy(img_right.data,img_lr_pkg->right_img->data,ce_config_get_cf_img_size());
         
-
-        remap(img_left, img_left_remap, l_remapx, l_remapy, cv::INTER_LINEAR);
-        remap(img_right, img_right_remap, r_remapx, r_remapy, cv::INTER_LINEAR);
     
-        //另一种不需要转换矩阵的方式
-        //undistort(img_left,img_left_remap,cameraMatrix,distCoeffs);
-  
-        
-        //Mat img1p, img2p, dispp;
-        //copyMakeBorder(img1, img1p, 0, 0, numberOfDisparities, 0, IPL_BORDER_REPLICATE);
-        //copyMakeBorder(img2, img2p, 0, 0, numberOfDisparities, 0, IPL_BORDER_REPLICATE);
-    
-        disp_filter(img_left_remap, 
-                    img_right_remap, 
+        disp_filter(img_left, 
+                    img_right, 
                     disp8_raw,
                     disp8_filter);
      
@@ -353,20 +305,14 @@ static void* ce_disp_filter(void *)
         ce_merge_img(result_raw,disp8_raw,disp8_filter);
         ce_merge_img(result_filter,disRGB_raw,disRGB_filter);
         
-//         disp8_raw.colRange( 0, disp8_raw.cols).copyTo(result_raw.colRange(0, disp8_raw.cols));
-//         disp8_filter.colRange( 0, disp8_filter.cols).copyTo(result_raw.colRange(disp8_raw.cols, result_raw.cols));
-         cv::imshow("result_raw",result_raw);
-        
-//         disRGB_raw.colRange( 0, disRGB_raw.cols).copyTo(result_filter.colRange(0, disRGB_raw.cols));
-//         disRGB_filter.colRange( 0, disRGB_filter.cols).copyTo(result_filter.colRange(disRGB_raw.cols, result_filter.cols));
-         cv::imshow("result_filter",result_filter);
+        cv::imshow("result_raw",result_raw);
+        cv::imshow("result_filter",result_filter);
         
         //reprojectImageTo3D(disp, xyz, Q, true);   
         //imshow("xyz", xyz);
         
         cv::waitKey(1);
 
-        
         delete img_lr_pkg->left_img;
         delete img_lr_pkg->right_img;
         delete img_lr_pkg;
@@ -395,7 +341,6 @@ void ce_disp_filter_close()
         pthread_join(ce_disp_filter_thread,NULL);
     }
 }
-
 
 
 void SIGINTHandler(int nSig)

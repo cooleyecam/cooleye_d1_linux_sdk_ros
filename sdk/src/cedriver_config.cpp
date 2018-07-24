@@ -237,7 +237,9 @@ void ce_config_load_settings(const char* settings_file)
     gc_camd1.gc_cam.cf_cam_auto_E_man_G_Ebottom = ce_config_get_cf_int_para(&settingsList, "cf_cam_auto_E_man_G_Ebottom");
     gc_camd1.gc_cam.cf_cam_auto_E_man_G = ce_config_get_cf_int_para(&settingsList, "cf_cam_auto_E_man_G");
     gc_camd1.gc_cam.cf_cam_agc_aec_skip_frame = ce_config_get_cf_int_para(&settingsList, "cf_cam_agc_aec_skip_frame");
-
+    
+    gc_camd1.gc_cam.cf_cam_rectify = ce_config_get_cf_int_para(&settingsList, "cf_cam_rectify");
+    
     std::cout << "cf_cam_mode: " << gc_camd1.gc_cam.cf_cam_mode <<std::endl;
     std::cout << "cf_cam_FPS: " << gc_camd1.gc_cam.cf_cam_FPS <<std::endl;
     std::cout << "cf_cam_EG_mode: " << gc_camd1.gc_cam.cf_cam_EG_mode <<std::endl;
@@ -250,7 +252,8 @@ void ce_config_load_settings(const char* settings_file)
     std::cout << "cf_cam_auto_E_man_G_Ebottom: " << gc_camd1.gc_cam.cf_cam_auto_E_man_G_Ebottom <<std::endl;
     std::cout << "cf_cam_auto_E_man_G: " << gc_camd1.gc_cam.cf_cam_auto_E_man_G <<std::endl;
     std::cout << "cf_cam_agc_aec_skip_frame: " << gc_camd1.gc_cam.cf_cam_agc_aec_skip_frame <<std::endl;
-
+    
+    std::cout << "cf_cam_rectify: " << gc_camd1.gc_cam.cf_cam_rectify <<std::endl;
 
     gc_camd1.gc_imu.cf_imu_uart = ce_config_get_cf_string_para(&settingsList, "cf_imu_uart");
     gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_X = ce_config_get_cf_float_para(&settingsList, "cf_imu_icm20689_acc_bias_X");
@@ -300,6 +303,8 @@ void ce_config_load_settings(const char* settings_file)
     
     gc_camd1.gc_ros.cf_ros_showimage = ce_config_get_cf_int_para(&settingsList, "cf_ste_algorithm");
     std::cout << "cf_ste_algorithm: " << gc_camd1.gc_ste.cf_ste_algorithm <<std::endl;
+    
+
     
     ce_config_get_img_config();
 }
@@ -471,7 +476,9 @@ int ce_config_get_cf_cam_auto_E_man_G_Etop(){ return gc_camd1.gc_cam.cf_cam_auto
 int ce_config_get_cf_cam_auto_E_man_G_Ebottom(){ return gc_camd1.gc_cam.cf_cam_auto_E_man_G_Ebottom; }
 int ce_config_get_cf_cam_auto_E_man_G(){ return gc_camd1.gc_cam.cf_cam_auto_E_man_G; }
 int ce_config_get_cf_cam_agc_aec_skip_frame(){ return gc_camd1.gc_cam.cf_cam_agc_aec_skip_frame; }
-
+int ce_config_get_cf_cam_rectify(){ return gc_camd1.gc_cam.cf_cam_rectify; }
+int ce_config_get_cf_cam_rectify_force_on(){ gc_camd1.gc_cam.cf_cam_rectify = 1; }
+int ce_config_get_cf_cam_rectify_force_off(){ gc_camd1.gc_cam.cf_cam_rectify = 0; }
 
 int ce_config_get_cf_img_width(){ return gc_camd1.gc_img.cf_img_width; }
 int ce_config_get_cf_img_height(){ return gc_camd1.gc_img.cf_img_height; }

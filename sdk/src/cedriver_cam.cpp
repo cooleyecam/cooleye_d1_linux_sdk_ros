@@ -20,11 +20,19 @@
 #include "cedriver_usb.h"
 #include "cedriver_cam.h"
 #include "threadsafe_queue.h"
-
-
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
 #include "cedriver_config.h"
+
+
+#include "opencv2/core/core.hpp"
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/calib3d/calib3d.hpp"
+
+#include "opencv2/core/utility.hpp"
+#include "opencv2/ximgproc/disparity_filter.hpp"
+
+
+
 
 #define LOG         printf
 
@@ -36,11 +44,12 @@ pthread_t ce_camd1l_capture_thread = 0;
 pthread_t ce_camd1r_capture_thread = 0;
 bool ce_cam_capture_stop_run=false;
 
-pthread_t ce_cam_showimg_thread;
+pthread_t ce_cam_showimg_thread = 0;
 bool ce_cam_showimg_stop_run = false;
 
-pthread_t ce_cam_preprocess_thread;
+pthread_t ce_cam_preprocess_thread = 0;
 bool ce_cam_preprocess_stop_run = false;
+
 
 threadsafe_queue<img_pkg *> img_pkg_left_list;
 threadsafe_queue<img_pkg *> img_pkg_right_list;
@@ -648,14 +657,56 @@ void ce_cam_showimg_close()
 
 static void* ce_cam_preprocess(void *)
 {
-    cv::Mat  img_left(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
+    
+    
+    cv::Mat img_left(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
     cv::Mat img_right(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
+    
+    cv::Mat img_left_remap(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
+    cv::Mat img_right_remap(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
 
+    cv::Mat M1, D1, M2, D2;
+    cv::Mat R, T, R1, P1, R2, P2 ,Q;
+
+    cv::Mat l_remapx,l_remapy,r_remapx,r_remapy;   
+        
+    cv::FileStorage fs("../config/intrinsics.yml", cv::FileStorage::READ);
+    if(!fs.isOpened())
+    {
+        printf("Failed to open file intrinsic_filename \n");
+    }
+
+    fs["M1"] >> M1;
+    fs["D1"] >> D1;
+    fs["M2"] >> M2;
+    fs["D2"] >> D2;
+
+    fs.open("../config/extrinsics.yml", cv::FileStorage::READ);
+    if(!fs.isOpened())
+    {
+        printf("Failed to open file extrinsic_filename \n");
+    }
+
+    fs["R"] >> R;
+    fs["T"] >> T;
+    
+    fs["R1"] >> R1;
+    fs["R2"] >> R2;
+    fs["P1"] >> P1;
+    fs["P2"] >> P2;
+    fs["Q"] >> Q;
+    
+    
+    cv::fisheye::initUndistortRectifyMap(M1, D1, R1, P1, img_left.size(), CV_16SC2, l_remapx, l_remapy);
+    cv::fisheye::initUndistortRectifyMap(M2, D2, R2, P2, img_right.size(), CV_16SC2, r_remapx, r_remapy);
+    
+    
     img_pkg timg_pkg;
 
     img_pkg *l_img_pkg = NULL;
     img_pkg *r_img_pkg = NULL;
 
+    
     while(!ce_cam_preprocess_stop_run)
     {
         if((!img_pkg_left_list.empty()) && (!img_pkg_right_list.empty()))
@@ -701,6 +752,19 @@ static void* ce_cam_preprocess(void *)
                 t_output_pkg->left_img->timestamp = l_img_pkg->timestamp;      // merger the timestamp to left
                 t_output_pkg->right_img->timestamp = l_img_pkg->timestamp;
 
+                
+                if(ce_config_get_cf_cam_rectify())
+                {
+                    memcpy(img_left.data, t_output_pkg->left_img->data, ce_config_get_cf_img_size());
+                    memcpy(img_right.data,t_output_pkg->right_img->data,ce_config_get_cf_img_size());
+        
+                    remap(img_left, img_left_remap, l_remapx, l_remapy, cv::INTER_LINEAR);
+                    remap(img_right, img_right_remap, r_remapx, r_remapy, cv::INTER_LINEAR);
+                    
+                    memcpy(t_output_pkg->left_img->data, img_left_remap.data, ce_config_get_cf_img_size());
+                    memcpy(t_output_pkg->right_img->data, img_right_remap.data, ce_config_get_cf_img_size());
+                }
+                
                 d1_img_output_pkg *t_pkg_giveup = NULL;
 
                 img_pkg_list_d1.push(t_output_pkg, t_pkg_giveup, 30);

@@ -45,116 +45,81 @@ int g_nCtrl = 1;
 
 static void* ce_ste_match(void *)
 {
+    ce_config_get_cf_cam_rectify_force_on();
+    
     cv::Mat img_left(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
     cv::Mat img_right(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
 
-    cv::Mat img_left_remap(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
-    cv::Mat img_right_remap(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
-
     cv::Mat disparity(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
-
-    Mat M1, D1, M2, D2;
-    Mat R, T, R1, P1, R2, P2 ,Q;
+    cv::Mat result_rect;
+    
+    Mat Q;
     Mat xyz;
     Mat disp, disp8;
     Rect roi1, roi2;
-    Mat l_remapx,l_remapy,r_remapx,r_remapy;
-    
-    Mat result_raw(img_left.rows, img_left.cols + img_right.cols,img_left.type());
-    Mat result_rect(img_left_remap.rows, img_left_remap.cols + img_right_remap.cols,img_left_remap.type());
+
     Mat disRGB;
     
     Ptr<StereoBM> bm = StereoBM::create(16,9);
     Ptr<StereoSGBM> sgbm = StereoSGBM::create(0,16,3);
     
-    
-    FileStorage fs("../config/intrinsics.yml", FileStorage::READ);
-    if(!fs.isOpened())
-    {
-        printf("Failed to open file intrinsic_filename \n");
-    }
-
-    fs["M1"] >> M1;
-    fs["D1"] >> D1;
-    fs["M2"] >> M2;
-    fs["D2"] >> D2;
-
-    fs.open("../config/extrinsics.yml", FileStorage::READ);
-    if(!fs.isOpened())
-    {
-        printf("Failed to open file extrinsic_filename \n");
-    }
-
-    fs["R"] >> R;
-    fs["T"] >> T;
-    
-    fs["R1"] >> R1;
-    fs["R2"] >> R2;
-    fs["P1"] >> P1;
-    fs["P2"] >> P2;
-    fs["Q"] >> Q;
-    
-    
-    
-    fisheye::initUndistortRectifyMap(M1, D1, R1, P1, img_left.size(), CV_16SC2, l_remapx, l_remapy);
-    fisheye::initUndistortRectifyMap(M2, D2, R2, P2, img_right.size(), CV_16SC2, r_remapx, r_remapy);
-    
     ////////////////////////////////////////////////////////////////////////////////////
-        enum { STEREO_BM=0, STEREO_SGBM=1, STEREO_HH=2, STEREO_VAR=3, STEREO_3WAY=4 };
-        int alg = STEREO_SGBM;
-        int SADWindowSize, numberOfDisparities;
-        bool no_display;
-        float scale;
+    enum { STEREO_BM=0, STEREO_SGBM=1, STEREO_HH=2, STEREO_VAR=3, STEREO_3WAY=4 };
+    int alg = STEREO_SGBM;
+    int SADWindowSize, numberOfDisparities;
+    bool no_display;
+    float scale;
 
-        
-        alg = STEREO_HH;
 
-        numberOfDisparities = 128;    
-        SADWindowSize =15;
-        scale = 1.0;
-        no_display = false;
+    alg = ce_config_get_cf_ste_algorithm();
 
-        int color_mode = alg == STEREO_BM ? 0 : -1;
-
-        Mat img1 = img_left_remap;
-        Mat img2 = img_right_remap;
     
-        Size img_size = img1.size();
+    numberOfDisparities = 128;    
+    SADWindowSize =15;
+    scale = 1.0;
+    no_display = false;
 
-        numberOfDisparities = numberOfDisparities > 0 ? numberOfDisparities : ((img_size.width/8) + 15) & -16;
+    int color_mode = alg == STEREO_BM ? 0 : -1;
 
-        bm->setROI1(roi1);
-        bm->setROI2(roi2);
-        bm->setPreFilterCap(31);
-        bm->setBlockSize(SADWindowSize > 0 ? SADWindowSize : 9);
-        bm->setMinDisparity(0);
-        bm->setNumDisparities(numberOfDisparities);
-        bm->setTextureThreshold(10);
-        bm->setUniquenessRatio(15);
-        bm->setSpeckleWindowSize(100);
-        bm->setSpeckleRange(32);
-        bm->setDisp12MaxDiff(1);
+    Mat img1 = img_left;
+    Mat img2 = img_right;
 
-        sgbm->setPreFilterCap(63);
-        int sgbmWinSize = SADWindowSize > 0 ? SADWindowSize : 3;
-        sgbm->setBlockSize(sgbmWinSize);
+    Size img_size = img1.size();
 
-        int cn = img1.channels();
+    numberOfDisparities = numberOfDisparities > 0 ? numberOfDisparities : ((img_size.width/8) + 15) & -16;
 
-        sgbm->setP1(8*cn*sgbmWinSize*sgbmWinSize);
-        sgbm->setP2(32*cn*sgbmWinSize*sgbmWinSize);
-        sgbm->setMinDisparity(0);
-        sgbm->setNumDisparities(numberOfDisparities);
-        sgbm->setUniquenessRatio(10);
-        sgbm->setSpeckleWindowSize(100);
-        sgbm->setSpeckleRange(32);
-        sgbm->setDisp12MaxDiff(1);
-        if(alg==STEREO_HH)
-            sgbm->setMode(StereoSGBM::MODE_HH);
-        else if(alg==STEREO_SGBM)
-            sgbm->setMode(StereoSGBM::MODE_SGBM);
-        else if(alg==STEREO_3WAY)
-            sgbm->setMode(StereoSGBM::MODE_SGBM_3WAY);
+    bm->setROI1(roi1);
+    bm->setROI2(roi2);
+    bm->setPreFilterCap(31);
+    bm->setBlockSize(SADWindowSize > 0 ? SADWindowSize : 9);
+    bm->setMinDisparity(0);
+    bm->setNumDisparities(numberOfDisparities);
+    bm->setTextureThreshold(10);
+    bm->setUniquenessRatio(15);
+    bm->setSpeckleWindowSize(100);
+    bm->setSpeckleRange(32);
+    bm->setDisp12MaxDiff(1);
+
+    sgbm->setPreFilterCap(63);
+    int sgbmWinSize = SADWindowSize > 0 ? SADWindowSize : 3;
+    sgbm->setBlockSize(sgbmWinSize);
+
+    int cn = img1.channels();
+
+    sgbm->setP1(8*cn*sgbmWinSize*sgbmWinSize);
+    sgbm->setP2(32*cn*sgbmWinSize*sgbmWinSize);
+    sgbm->setMinDisparity(0);
+    sgbm->setNumDisparities(numberOfDisparities);
+    sgbm->setUniquenessRatio(10);
+    sgbm->setSpeckleWindowSize(100);
+    sgbm->setSpeckleRange(32);
+    sgbm->setDisp12MaxDiff(1);
+    if(alg==STEREO_HH)
+    sgbm->setMode(StereoSGBM::MODE_HH);
+    else if(alg==STEREO_SGBM)
+    sgbm->setMode(StereoSGBM::MODE_SGBM);
+    else if(alg==STEREO_3WAY)
+    sgbm->setMode(StereoSGBM::MODE_SGBM_3WAY);
       
     ///////////////////////////////////////////////////////////
     
@@ -181,18 +146,9 @@ static void* ce_ste_match(void *)
         memcpy(img_left.data, img_lr_pkg->left_img->data, ce_config_get_cf_img_size());
         memcpy(img_right.data,img_lr_pkg->right_img->data,ce_config_get_cf_img_size());
         
-        remap(img_left, img_left_remap, l_remapx, l_remapy, cv::INTER_LINEAR);
-        remap(img_right, img_right_remap, r_remapx, r_remapy, cv::INTER_LINEAR);
-    
-        //另一种不需要转换矩阵的方式
-        //undistort(img_left,img_left_remap,cameraMatrix,distCoeffs);
-  
-        //Mat img1p, img2p, dispp;
-        //copyMakeBorder(img1, img1p, 0, 0, numberOfDisparities, 0, IPL_BORDER_REPLICATE);
-        //copyMakeBorder(img2, img2p, 0, 0, numberOfDisparities, 0, IPL_BORDER_REPLICATE);
-    
-        img1 = img_left_remap;
-        img2 = img_right_remap;
+
+        img1 = img_left;
+        img2 = img_right;
         
         int64 t = getTickCount();
         if( alg == STEREO_BM )
@@ -212,10 +168,8 @@ static void* ce_ste_match(void *)
         reprojectImageTo3D(disp, xyz, Q, true);   
         //imshow("xyz", xyz);
         
-        ce_merge_img(result_raw, img_left, img_right);
-        ce_merge_img(result_rect, img_left_remap, img_right_remap);
+        ce_merge_img(result_rect, img_left, img_right);
         
-        cv::imshow("result_raw",result_raw);
         cv::imshow("result_rect",result_rect);
 
         imshow("disparity", disp8);
@@ -231,8 +185,6 @@ static void* ce_ste_match(void *)
     ce_ste_match_thread = 0;
     pthread_exit(NULL);
 }
-
-
 
 
 int ce_ste_match_init()
@@ -326,11 +278,12 @@ int main(int argc, char* argv[])
         sleep(100);
     }
 
-    
     ce_imu_capture_close();
+    
     ce_imu_showdata_close();
 
     ce_cam_capture_close();
+    
     ce_ste_match_close();
     return 0;
 }

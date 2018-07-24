@@ -112,6 +112,7 @@ typedef struct
     int cf_cam_auto_E_man_G_Ebottom;
     int cf_cam_auto_E_man_G;
     int cf_cam_agc_aec_skip_frame;
+    int cf_cam_rectify;
 
 }global_cam_config;
 
