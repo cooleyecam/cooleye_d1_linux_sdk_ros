@@ -67,10 +67,10 @@ cf_cam_auto_E_man_G=500;
 cf_cam_agc_aec_skip_frame=0;
 #####################################
 ## 0 = raw    1= rectify
-cf_cam_rectify=0;
+cf_cam_rectify=1;
 #####################################
 #####################################
-cf_ros_showimage=1;
+cf_ros_showimage=0;
 #####################################
 #stereo_match_algorithm
 #STEREO_BM=0
@@ -78,4 +78,4 @@ cf_ros_showimage=1;
 #STEREO_HH=2
 #STEREO_3WAY=4
 ###################################
-cf_ste_algorithm=0;
+cf_ste_algorithm=2;

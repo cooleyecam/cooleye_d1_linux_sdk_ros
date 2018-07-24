@@ -165,7 +165,7 @@ static void* ce_ste_match(void *)
         else
             disp.convertTo(disp8, CV_8U);
     
-        reprojectImageTo3D(disp, xyz, Q, true);   
+        //reprojectImageTo3D(disp, xyz, Q, true);   
         //imshow("xyz", xyz);
         
         ce_merge_img(result_rect, img_left, img_right);

@@ -752,7 +752,7 @@ static void* ce_cam_preprocess(void *)
                 t_output_pkg->left_img->timestamp = l_img_pkg->timestamp;      // merger the timestamp to left
                 t_output_pkg->right_img->timestamp = l_img_pkg->timestamp;
 
-                
+
                 if(ce_config_get_cf_cam_rectify())
                 {
                     memcpy(img_left.data, t_output_pkg->left_img->data, ce_config_get_cf_img_size());
