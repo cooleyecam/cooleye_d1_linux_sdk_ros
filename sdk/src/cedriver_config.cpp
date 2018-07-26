@@ -186,10 +186,34 @@ static void ce_config_get_img_config()
     std::cout << "cf_img_time_offset: " << gc_camd1.gc_img.cf_img_time_offset <<std::endl;
 }
 
+
+void replace_string(char *result, char *source, char* s1, char *s2)
+{
+    char *q=NULL;
+    char *p=NULL;
+   
+    p=source;
+    while((q=strstr(p, s1))!=NULL)
+    {
+        strncpy(result, p, q-p);
+        result[q-p]= '\0';//very important, must attention!
+        strcat(result, s2);
+        strcat(result, q+strlen(s1));
+        strcpy(p,result);
+    }
+    strcpy(result, p);    
+}
+
+
+
 void ce_config_load_settings(const char* settings_file)
 {
     /******************************* Load Settings File ***************************************/
     std::string cecamd1_config_file = settings_file;
+
+   
+    
+    
 
     std::ifstream ifs_settings(cecamd1_config_file.c_str());
     if(!ifs_settings )
@@ -203,8 +227,7 @@ void ce_config_load_settings(const char* settings_file)
     std::string timestamp;
     std::vector<std::string> settingsList;
     int linecount=0;
-
-
+    
     while(getline(ifs_settings,line_settings))
     {
         if(line_settings.at(0)!='#')
@@ -214,6 +237,33 @@ void ce_config_load_settings(const char* settings_file)
         }
     }
     ifs_settings.close();
+    
+    
+    
+    char fileFullName1[256] = {0};
+    char fileFullName2[256] = {0};
+  
+    char *pCur = (char*)settings_file;
+    char *pEnd = pCur + strlen(settings_file);
+    while(pCur < pEnd)
+    {
+        if (*pEnd == '/')
+            break;        
+        pEnd--;        
+    }
+    
+    if (*pEnd == '/')
+    {
+        pEnd++;        
+        memcpy(fileFullName1, pCur, pEnd - pCur);
+        memcpy(fileFullName2, pCur, pEnd - pCur);        
+    }    
+    
+    strcat(fileFullName1, "intrinsics.yml");
+    strcat(fileFullName2, "extrinsics.yml");
+    
+    gc_camd1.gc_cam.cf_cam_intrinsics = fileFullName1;
+    gc_camd1.gc_cam.cf_cam_extrinsics = fileFullName2;
     
     
     gc_camd1.gc_dev.cf_dev_name = ce_config_get_cf_string_para(&settingsList, "cf_dev_name");
@@ -479,6 +529,12 @@ int ce_config_get_cf_cam_agc_aec_skip_frame(){ return gc_camd1.gc_cam.cf_cam_agc
 int ce_config_get_cf_cam_rectify(){ return gc_camd1.gc_cam.cf_cam_rectify; }
 int ce_config_get_cf_cam_rectify_force_on(){ gc_camd1.gc_cam.cf_cam_rectify = 1; }
 int ce_config_get_cf_cam_rectify_force_off(){ gc_camd1.gc_cam.cf_cam_rectify = 0; }
+
+std::string ce_config_get_cf_cam_intrinsics(){ return gc_camd1.gc_cam.cf_cam_intrinsics; }
+std::string ce_config_get_cf_cam_extrinsics(){ return gc_camd1.gc_cam.cf_cam_extrinsics; }
+
+
+
 
 int ce_config_get_cf_img_width(){ return gc_camd1.gc_img.cf_img_width; }
 int ce_config_get_cf_img_height(){ return gc_camd1.gc_img.cf_img_height; }

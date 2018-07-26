@@ -670,9 +670,10 @@ static void* ce_cam_preprocess(void *)
 
     cv::Mat l_remapx,l_remapy,r_remapx,r_remapy;   
         
-    cv::FileStorage fs("../config/intrinsics.yml", cv::FileStorage::READ);
+    cv::FileStorage fs(ce_config_get_cf_cam_intrinsics(), cv::FileStorage::READ);
     if(!fs.isOpened())
     {
+
         printf("Failed to open file intrinsic_filename \n");
     }
 
@@ -681,10 +682,12 @@ static void* ce_cam_preprocess(void *)
     fs["M2"] >> M2;
     fs["D2"] >> D2;
 
-    fs.open("../config/extrinsics.yml", cv::FileStorage::READ);
+    fs.open(ce_config_get_cf_cam_extrinsics(), cv::FileStorage::READ);
     if(!fs.isOpened())
     {
-        printf("Failed to open file extrinsic_filename \n");
+
+        printf("Failed to open file extrinsics_filename \n");
+
     }
 
     fs["R"] >> R;

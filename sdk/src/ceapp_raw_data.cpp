@@ -27,6 +27,10 @@ void SIGINTHandler(int nSig)
         g_nCtrl = 1;
 }
 
+
+
+
+
 int main(int argc, char* argv[])
 {
     signal(SIGINT, SIGINTHandler);

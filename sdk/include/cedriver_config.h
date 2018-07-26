@@ -33,6 +33,9 @@ int ce_config_get_cf_cam_rectify();
 int ce_config_get_cf_cam_rectify_force_on();
 int ce_config_get_cf_cam_rectify_force_off();
 
+std::string ce_config_get_cf_cam_intrinsics();
+std::string ce_config_get_cf_cam_extrinsics();
+
 
 int ce_config_get_cf_img_width();
 int ce_config_get_cf_img_height();
