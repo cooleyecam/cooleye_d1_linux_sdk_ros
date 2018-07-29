@@ -1,5 +1,5 @@
 # CoolEye D1 Linux SDK & ROS 
-### Version 0.3
+### Version 0.4
 本项目包括CoolEye D1 相机运行所需的必备文件,为了便于用于学习和使用,内容全部开源。
 主流的SLAM算法,图像拼接,智能识别等功能会陆续放出。
 
@@ -23,9 +23,52 @@
 - IMU输出 : ACC / GYRO 原始数据,帧率最大1K
 - 接口类型 : USB2.0
 
+
+--------------------------------------------------------------------------------------------------
+##目录
+- 一. SDK & ROS安装
+	- 1.1 SDK安装方法
+	- 1.2 ROS环境安装方法
+-  二. 标定相机相关
+	- 2.1 ROS环境下标定相机
+	- 2.2 kalibr 标定相关
+- 三. 运行算法相关
+	- 3.1 ORB-SLAM2算法的安装和使用
+	- 3.2 okvis算法的安装和使用
+	- 3.2 vins算法的安装和使用
+- 四. 相机固件升级方法
+	- 4.1 IMU操作固件升级
+	- 4.2 图像处理固件升级
+- 五. 常见问题汇总
+	- 5.1 串口无法打开
+	- 5.2 ORB_SLAM2的ROS环境编译不通过
+- 六. 硬件尺寸图
+- 修订历史
+
+-----------------------------------------------------------
+
+![enter image description here](https://ws1.sinaimg.cn/large/006tKfTcgy1ftnkfhworqj30ku0bqmy0.jpg)
+
+![enter image description here](https://ws4.sinaimg.cn/large/006tKfTcgy1ftnkggoo84j30ku0bqwfg.jpg)
+
+![enter image description here](https://ws1.sinaimg.cn/large/006tKfTcgy1ftnkgp0ekuj30ku0bqwf3.jpg)
+
+![enter image description here](https://ws1.sinaimg.cn/large/006tKfTcgy1ftnkh0ehc3j30ku0bq3zr.jpg)
+
+![enter image description here](https://ws1.sinaimg.cn/large/006tKfTcgy1ftnkh59ynwj30ku0bqgmp.jpg)
+
+![enter image description here](https://ws1.sinaimg.cn/large/006tKfTcgy1ftnkh9x834j30ku0bq0tk.jpg)
+
+![enter image description here](https://ws1.sinaimg.cn/large/006tKfTcgy1ftnkhe2b19j30ku0bq751.jpg)
+
+![enter image description here](https://ws2.sinaimg.cn/large/006tKfTcgy1ftnkhnj6ipj30ku0bqaaw.jpg)
+
+![enter image description here](https://ws2.sinaimg.cn/large/006tKfTcgy1ftnkhv9hpxj30ku0bq75c.jpg)
+
+
 -------------------------------------------------------------------------------------------------
 
-## 1. SDK & ROS安装
+## 一. SDK & ROS安装
 - 推荐环境：ubuntu 16.04 LTS
 
 - 推荐opencv版本：3.4.0
@@ -163,7 +206,7 @@ rostopic hz /imu0_icm20689 /cooleyed1/left/image_raw /cooleyed1/right/image_raw
 
 -------------------------------------------------------------------------------------------------
 
-## 2. 标定相机相关
+## 二. 标定相机相关
 ### 2.1 ROS环境下标定相机
 首先,可以直接参考官方文档,下文的说明只是对官方文档的注解
 ```
@@ -430,7 +473,7 @@ kalibr_calibrate_imu_camera --bag 2018-05-09-23-55-02.bag \
 
 -------------------------------------------------------------------------------------------------
 
-## 3. 运行算法相关
+## 三. 运行算法相关
 
 ### 3.1 ORB-SLAM2算法的安装和使用
 ORB_SLAM2是比较火的算法，并熟悉SLAM的人也可以通过它快速搭建SLAM算法的环境。 
@@ -581,11 +624,33 @@ https://blog.csdn.net/xiat5/article/details/79164059
 
 
 
-
+### 3.3 ORB-SLAM2算法的安装和使用
+	
+vins是香港科技大学开源的一个单目相机结合IMU的一个VIO，在github上可以下载源码，分为iOS系统下的和ros系统下的两种.本相机当然是适用ROS版本.
+```
+https://github.com/HKUST-Aerial-Robotics/VINS-Mono.git
+```
+1. 根据提示安装ROS必备得依赖包
+```
+sudo apt-get install ros-kinetic-cv-bridge ros-kinetic-tf ros-kinetic-message-filters ros-kinetic-image-transport
+```
+2. Ceres Solver是必备得组件,请参照下方教程安装最新版.
+```
+http://ceres-solver.org/installation.html#linux
+```
+3. 按照官方指导编译VINS-Mono的开发环境
+```
+cd ~/catkin_ws/src
+git clone https://github.com/HKUST-Aerial-Robotics/VINS-Mono.git
+cd ../
+catkin_make
+source ~/catkin_ws/devel/setup.bash
+```
+4. 根据相机内参编写config和launch文件.即可运行VINS算法.
 
 -------------------------------------------------------------------------------------------------
 
-## 4. 相机固件升级方法
+## 四. 相机固件升级方法
 
 ### 4.1 IMU操作固件升级
 目前版本硬件，IMU的控制依赖于一个小型的单片机，如果需要升级，sdk/update会直接发布程序的HEX文件。windows下可使用FlyMcu进行升级，操作步骤见下图。另，熟悉STM32的用户，可根据自己习惯选择自己喜欢的升级方式。
@@ -603,7 +668,7 @@ D:\Cypress\USB\CY3684_EZ-USB_FX2LP_DVK\1.1\Drivers\vista
 
 -------------------------------------------------------------------------------------------------
 
-### 5. 常见问题汇总
+### 五. 常见问题汇总
 #### 5.1 串口无法打开
 - celog: uart open error !: Permission denied
 
@@ -669,7 +734,7 @@ ${PROJECT_SOURCE_DIR}/../../../lib/libboost_system.so
 ```
 
 
-### 6. 硬件尺寸图
+### 六. 硬件尺寸图
 下图说明了相机的IMU和双目之间的结构图关系，由于是正视图，因此左右相机正好相反，使用时注意：
 
 ![enter image description here](https://ws1.sinaimg.cn/large/006tKfTcgy1fs8og6na6pj318g0eu0tl.jpg)
@@ -680,7 +745,7 @@ ${PROJECT_SOURCE_DIR}/../../../lib/libboost_system.so
 - 2018-06-03手册首次发布
 - 2018-06-08增加相机升级教程，kalibr的安装教程，常见问题汇总
 - 2018-06-12增加okvis算法的安装
-- 2018-07-03增加视差输出,畸变矫正输出,增加iopencv鱼眼标定程序
-
+- 2018-07-03增加视差输出,畸变矫正输出,增加opencv鱼眼标定程序
+- 2018-07-26增加VINS算法
 
 
