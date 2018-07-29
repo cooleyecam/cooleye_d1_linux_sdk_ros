@@ -25,7 +25,7 @@
 
 
 --------------------------------------------------------------------------------------------------
-##目录
+## 目录
 - 一. SDK & ROS安装
 	- 1.1 SDK安装方法
 	- 1.2 ROS环境安装方法
@@ -64,6 +64,15 @@
 ![enter image description here](https://ws2.sinaimg.cn/large/006tKfTcgy1ftnkhnj6ipj30ku0bqaaw.jpg)
 
 ![enter image description here](https://ws2.sinaimg.cn/large/006tKfTcgy1ftnkhv9hpxj30ku0bq75c.jpg)
+
+--------------------------------------------------------------------------------------------------------
+VINS-Mono 测试效果图
+
+![enter image description here](https://ws4.sinaimg.cn/large/006tNc79gy1ftqy85tb83g31hc0u0x6q.gif)
+
+![enter image description here](https://ws4.sinaimg.cn/large/006tNc79gy1ftqy8zocseg31hc0u07wk.gif)
+
+![enter image description here](https://ws2.sinaimg.cn/large/006tNc79gy1ftqy9h2149g31hc0u0qv7.gif)
 
 
 -------------------------------------------------------------------------------------------------
