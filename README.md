@@ -574,6 +574,24 @@ chmod +x build_ros.sh
 ```
 至此编译完成。
 
+注意: ORB_SLAM2默认ROS的topic为:
+```
+"/camera/left/image_raw"
+"/camera/right/image_raw"
+```
+需更改为cooleye相机默认的:
+```
+"/cooleyed1/left/image_raw"
+"/cooleyed1/right/image_raw"
+```
+
+需要更改的文件有:
+```
+Examples/ROS/ORB_SLAM2/src/ros_mono.cc
+Examples/ROS/ORB_SLAM2/src/ros_stereo.cc
+Examples/ROS/ORB_SLAM2/src/ros_rgbd.cc
+Examples/ROS/ORB_SLAM2/src/AR/ros_mono_ar.cc:
+```
 
 
 ### 3.2 okvis算法的安装和使用
@@ -633,7 +651,7 @@ https://blog.csdn.net/xiat5/article/details/79164059
 
 
 
-### 3.3 ORB-SLAM2算法的安装和使用
+### 3.3 vins算法的安装和使用
 	
 vins是香港科技大学开源的一个单目相机结合IMU的一个VIO，在github上可以下载源码，分为iOS系统下的和ros系统下的两种.本相机当然是适用ROS版本.
 ```
