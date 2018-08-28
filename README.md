@@ -196,7 +196,7 @@ cd ~/src/cooleye_d1_linux_sdk_ros/ros
 
 catkin_make
 
-source ~/src/cooleye_d1_linux_sdk_ros/devel/setup.bash
+source ~/src/cooleye_d1_linux_sdk_ros/ros/devel/setup.bash
 ```
 	
 至此编译完成.执行以下命令即可运行相机.
