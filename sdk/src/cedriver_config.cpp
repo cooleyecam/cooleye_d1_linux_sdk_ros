@@ -351,7 +351,7 @@ void ce_config_load_settings(const char* settings_file)
     gc_camd1.gc_ros.cf_ros_showimage = ce_config_get_cf_int_para(&settingsList, "cf_ros_showimage");
     std::cout << "cf_ros_showimage: " << gc_camd1.gc_ros.cf_ros_showimage <<std::endl;
     
-    gc_camd1.gc_ros.cf_ros_showimage = ce_config_get_cf_int_para(&settingsList, "cf_ste_algorithm");
+    gc_camd1.gc_ste.cf_ste_algorithm = ce_config_get_cf_int_para(&settingsList, "cf_ste_algorithm");
     std::cout << "cf_ste_algorithm: " << gc_camd1.gc_ste.cf_ste_algorithm <<std::endl;
     
 
