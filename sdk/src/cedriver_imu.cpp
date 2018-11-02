@@ -265,7 +265,6 @@ static int ce_imu_cmd_icm20689_start()
 
 static int ce_imu_cmd_sample_rate()
 {
-    
     unsigned char tcmd[10] = {0,0,0,0,0, 0,0,0,0,0};
 
     tcmd[0] = CMD_HEAD1;

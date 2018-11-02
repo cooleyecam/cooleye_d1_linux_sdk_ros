@@ -67,7 +67,7 @@ cf_cam_auto_E_man_G=500;
 cf_cam_agc_aec_skip_frame=0;
 #####################################
 ## 0 = raw    1= rectify
-cf_cam_rectify=1;
+cf_cam_rectify=0;
 #####################################
 #####################################
 cf_ros_showimage=0;

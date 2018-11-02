@@ -122,7 +122,37 @@ static int ce_cam_i2c_write(int cam_num, unsigned char reg,int value)
     return r;
 }
 
+static int ce_cam_i2c_readrom(int cam_num)
+{
+    unsigned char buf[64];
+    int r = libusb_control_transfer(ce_cam_get_cam_handle(cam_num),RT_D2H,0xA9,0xFF00,0,buf,64,1000);
+    if(r != 64)
+    {
+        LOG("celog: cam%d,i:0x%02X,r:%d\r\n",cam_num,0xA9,r);
+        return r;
+    }
+ 
+    for(int i=0; i<64; i++)
+    {
+        LOG("buf[%d] = 0x%2X \r\n",i,buf[i]);
+    }
 
+    return r;
+}
+
+
+static int ce_cam_i2c_writerom(int cam_num, unsigned char* buf)
+{
+    //unsigned char buf[64];
+    int r = libusb_control_transfer(ce_cam_get_cam_handle(cam_num),RT_H2D,0xA9,0xFF00,0,buf,64,1000);
+    if(r != 64)
+    {
+        LOG("celog: cam%d,i:0x%02X,r:%d\r\n",cam_num,0xA9,r);
+        return r;
+    }
+ 
+    return r;
+}
 
 static int ce_cam_set_af_mode(int camlr)
 {
@@ -619,7 +649,9 @@ static void* ce_cam_showimg(void *)
         img_left.colRange( 0, img_left.cols).copyTo(result.colRange(0, img_left.cols));
  
         img_right.colRange( 0, img_right.cols).copyTo(result.colRange(img_left.cols, result.cols));
-        cv::imshow("result",result);
+    	cv::circle(result, cv::Point(376,240),10, cv::Scalar(0,0,255));   
+    	cv::circle(result, cv::Point(1128,240),10, cv::Scalar(0,0,255));   
+	cv::imshow("result",result);
         
         cv::waitKey(1);
 
