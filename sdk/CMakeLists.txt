@@ -17,7 +17,7 @@ include_directories("${PROJECT_SOURCE_DIR}/include")
 
 add_library(CEDRIVER_CONFIG src/cedriver_config.cpp)
 
-add_library(CEDRIVER_CAM src/cedriver_usb.cpp src/cedriver_cam.cpp)
+add_library(CEDRIVER_CAM src/cedriver_usb.cpp src/cedriver_cam.cpp src/logmsg.cpp)
 
 add_library(CELIB_MadgwickAHRS src/celib_MadgwickAHRS.cpp)
 
@@ -32,6 +32,15 @@ target_link_libraries(CEDRIVER_IMU CELIB_MadgwickAHRS )
 ## APP
 add_executable(CEAPP_RAW_DATA src/ceapp_raw_data.cpp)
 target_link_libraries(  CEAPP_RAW_DATA 
+                        CEDRIVER_CAM 
+                        CEDRIVER_CONFIG 
+                        CEDRIVER_IMU   
+                        usb-1.0 
+                        ${OpenCV_LIBS})
+
+
+add_executable(CEAPP_WRITE_DEVICEID src/ceapp_write_deviceid.cpp)
+target_link_libraries(  CEAPP_WRITE_DEVICEID
                         CEDRIVER_CAM 
                         CEDRIVER_CONFIG 
                         CEDRIVER_IMU   

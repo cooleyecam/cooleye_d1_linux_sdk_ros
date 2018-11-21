@@ -10,8 +10,25 @@
 
 global_config_d1 gc_camd1;
 
+std::ofstream g_PrintfFile; 
 
+#if 0
+#define CE_COUT std::cout
+#else
+#define CE_COUT  g_PrintfFile
+#endif
 
+int openStdoutFile()
+{
+    
+    g_PrintfFile.open("./printf.log");
+    assert(g_PrintfFile.is_open());
+}
+
+void closeStdoutFile()
+{
+    g_PrintfFile.close();             //关闭文件输入流 
+}
 
 
 static std::string ce_config_get_cf_string_para(std::vector<std::string> *tconfiglist,std::string cf_name)
@@ -172,18 +189,18 @@ static void ce_config_get_img_config()
     // A = cf_img_width    Q =  cf_img_VB  = reg05
     gc_camd1.gc_img.cf_img_VB = (CAMD1_SYS_CLKIN/gc_camd1.gc_cam.cf_cam_FPS - 4)/(gc_camd1.gc_img.cf_img_width + gc_camd1.gc_img.cf_img_HB) - gc_camd1.gc_img.cf_img_height;
 
-    std::cout << "cf_img_VB_old: " << gc_camd1.gc_img.cf_img_VB <<std::endl;
+    CE_COUT << "cf_img_VB_old: " << gc_camd1.gc_img.cf_img_VB <<std::endl;
     if(gc_camd1.gc_img.cf_img_VB < 0x2D)
         gc_camd1.gc_img.cf_img_VB = 0x2D;
 
-    std::cout << "cf_img_HB: " << gc_camd1.gc_img.cf_img_HB <<std::endl;
-    std::cout << "cf_img_VB: " << gc_camd1.gc_img.cf_img_VB <<std::endl;
+    CE_COUT << "cf_img_HB: " << gc_camd1.gc_img.cf_img_HB <<std::endl;
+    CE_COUT << "cf_img_VB: " << gc_camd1.gc_img.cf_img_VB <<std::endl;
 
 
     // time offset
     gc_camd1.gc_img.cf_img_time_offset = (1.0/CAMD1_SYS_CLKIN) * (gc_camd1.gc_img.cf_img_width +gc_camd1.gc_img.cf_img_HB)*480;
 
-    std::cout << "cf_img_time_offset: " << gc_camd1.gc_img.cf_img_time_offset <<std::endl;
+    CE_COUT << "cf_img_time_offset: " << gc_camd1.gc_img.cf_img_time_offset <<std::endl;
 }
 
 
@@ -210,9 +227,6 @@ void ce_config_load_settings(const char* settings_file)
 {
     /******************************* Load Settings File ***************************************/
     std::string cecamd1_config_file = settings_file;
-
-   
-    
     
 
     std::ifstream ifs_settings(cecamd1_config_file.c_str());
@@ -269,8 +283,8 @@ void ce_config_load_settings(const char* settings_file)
     gc_camd1.gc_dev.cf_dev_name = ce_config_get_cf_string_para(&settingsList, "cf_dev_name");
     gc_camd1.gc_dev.cf_dev_version = ce_config_get_cf_string_para(&settingsList, "cf_dev_version");
 
-    std::cout << "cf_dev_name: "<< gc_camd1.gc_dev.cf_dev_name <<std::endl;
-    std::cout << "cf_dev_version: "<< gc_camd1.gc_dev.cf_dev_version <<std::endl;
+    CE_COUT << "cf_dev_name: "<< gc_camd1.gc_dev.cf_dev_name <<std::endl;
+    CE_COUT << "cf_dev_version: "<< gc_camd1.gc_dev.cf_dev_version <<std::endl;
 
 
 
@@ -290,20 +304,20 @@ void ce_config_load_settings(const char* settings_file)
     
     gc_camd1.gc_cam.cf_cam_rectify = ce_config_get_cf_int_para(&settingsList, "cf_cam_rectify");
     
-    std::cout << "cf_cam_mode: " << gc_camd1.gc_cam.cf_cam_mode <<std::endl;
-    std::cout << "cf_cam_FPS: " << gc_camd1.gc_cam.cf_cam_FPS <<std::endl;
-    std::cout << "cf_cam_EG_mode: " << gc_camd1.gc_cam.cf_cam_EG_mode <<std::endl;
-    std::cout << "cf_cam_man_exp: " << gc_camd1.gc_cam.cf_cam_man_exp <<std::endl;
-    std::cout << "cf_cam_man_gain: " << gc_camd1.gc_cam.cf_cam_man_gain <<std::endl;
-    std::cout << "cf_cam_auto_EG_top: " << gc_camd1.gc_cam.cf_cam_auto_EG_top <<std::endl;
-    std::cout << "cf_cam_auto_EG_bottom: " << gc_camd1.gc_cam.cf_cam_auto_EG_bottom <<std::endl;
-    std::cout << "cf_cam_auto_EG_des: " << gc_camd1.gc_cam.cf_cam_auto_EG_des <<std::endl;
-    std::cout << "cf_cam_auto_E_man_G_Etop: " << gc_camd1.gc_cam.cf_cam_auto_E_man_G_Etop <<std::endl;
-    std::cout << "cf_cam_auto_E_man_G_Ebottom: " << gc_camd1.gc_cam.cf_cam_auto_E_man_G_Ebottom <<std::endl;
-    std::cout << "cf_cam_auto_E_man_G: " << gc_camd1.gc_cam.cf_cam_auto_E_man_G <<std::endl;
-    std::cout << "cf_cam_agc_aec_skip_frame: " << gc_camd1.gc_cam.cf_cam_agc_aec_skip_frame <<std::endl;
+    CE_COUT << "cf_cam_mode: " << gc_camd1.gc_cam.cf_cam_mode <<std::endl;
+    CE_COUT << "cf_cam_FPS: " << gc_camd1.gc_cam.cf_cam_FPS <<std::endl;
+    CE_COUT << "cf_cam_EG_mode: " << gc_camd1.gc_cam.cf_cam_EG_mode <<std::endl;
+    CE_COUT << "cf_cam_man_exp: " << gc_camd1.gc_cam.cf_cam_man_exp <<std::endl;
+    CE_COUT << "cf_cam_man_gain: " << gc_camd1.gc_cam.cf_cam_man_gain <<std::endl;
+    CE_COUT << "cf_cam_auto_EG_top: " << gc_camd1.gc_cam.cf_cam_auto_EG_top <<std::endl;
+    CE_COUT << "cf_cam_auto_EG_bottom: " << gc_camd1.gc_cam.cf_cam_auto_EG_bottom <<std::endl;
+    CE_COUT << "cf_cam_auto_EG_des: " << gc_camd1.gc_cam.cf_cam_auto_EG_des <<std::endl;
+    CE_COUT << "cf_cam_auto_E_man_G_Etop: " << gc_camd1.gc_cam.cf_cam_auto_E_man_G_Etop <<std::endl;
+    CE_COUT << "cf_cam_auto_E_man_G_Ebottom: " << gc_camd1.gc_cam.cf_cam_auto_E_man_G_Ebottom <<std::endl;
+    CE_COUT << "cf_cam_auto_E_man_G: " << gc_camd1.gc_cam.cf_cam_auto_E_man_G <<std::endl;
+    CE_COUT << "cf_cam_agc_aec_skip_frame: " << gc_camd1.gc_cam.cf_cam_agc_aec_skip_frame <<std::endl;
     
-    std::cout << "cf_cam_rectify: " << gc_camd1.gc_cam.cf_cam_rectify <<std::endl;
+    CE_COUT << "cf_cam_rectify: " << gc_camd1.gc_cam.cf_cam_rectify <<std::endl;
 
     gc_camd1.gc_imu.cf_imu_uart = ce_config_get_cf_string_para(&settingsList, "cf_imu_uart");
     gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_X = ce_config_get_cf_float_para(&settingsList, "cf_imu_icm20689_acc_bias_X");
@@ -326,33 +340,33 @@ void ce_config_load_settings(const char* settings_file)
 
     gc_camd1.gc_imu.cf_imu_icm20689_sample_rate = ce_config_get_cf_int_para(&settingsList, "cf_imu_icm20689_sample_rate");
 
-    std::cout << "cf_imu_uart: " << gc_camd1.gc_imu.cf_imu_uart <<std::endl;
-    std::cout << "cf_imu_acc_bias_X: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_X <<std::endl;
-    std::cout << "cf_imu_acc_bias_Y: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_Y <<std::endl;
-    std::cout << "cf_imu_acc_bias_Z: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_Z <<std::endl;
-    std::cout << "cf_imu_gyro_bias_X: " << gc_camd1.gc_imu.cf_imu_icm20689_gyro_bias_X <<std::endl;
-    std::cout << "cf_imu_gyro_bias_Y: " << gc_camd1.gc_imu.cf_imu_icm20689_gyro_bias_Y <<std::endl;
-    std::cout << "cf_imu_gyro_bias_Z: " << gc_camd1.gc_imu.cf_imu_icm20689_gyro_bias_Z <<std::endl;
+    CE_COUT << "cf_imu_uart: " << gc_camd1.gc_imu.cf_imu_uart <<std::endl;
+    CE_COUT << "cf_imu_acc_bias_X: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_X <<std::endl;
+    CE_COUT << "cf_imu_acc_bias_Y: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_Y <<std::endl;
+    CE_COUT << "cf_imu_acc_bias_Z: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_Z <<std::endl;
+    CE_COUT << "cf_imu_gyro_bias_X: " << gc_camd1.gc_imu.cf_imu_icm20689_gyro_bias_X <<std::endl;
+    CE_COUT << "cf_imu_gyro_bias_Y: " << gc_camd1.gc_imu.cf_imu_icm20689_gyro_bias_Y <<std::endl;
+    CE_COUT << "cf_imu_gyro_bias_Z: " << gc_camd1.gc_imu.cf_imu_icm20689_gyro_bias_Z <<std::endl;
 
-    std::cout << "cf_imu_acc_bias_X: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_X <<std::endl;
+    CE_COUT << "cf_imu_acc_bias_X: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_X <<std::endl;
 
 
-    std::cout << "cf_imu_icm20689_acc_T[0][0]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[0][0] <<std::endl;
-    std::cout << "cf_imu_icm20689_acc_T[0][1]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[0][1] <<std::endl;
-    std::cout << "cf_imu_icm20689_acc_T[0][2]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[0][2] <<std::endl;
-    std::cout << "cf_imu_icm20689_acc_T[1][0]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[1][0] <<std::endl;
-    std::cout << "cf_imu_icm20689_acc_T[1][1]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[1][1] <<std::endl;
-    std::cout << "cf_imu_icm20689_acc_T[1][2]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[1][2] <<std::endl;
-    std::cout << "cf_imu_icm20689_acc_T[2][0]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[2][0] <<std::endl;
-    std::cout << "cf_imu_icm20689_acc_T[2][1]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[2][1] <<std::endl;
-    std::cout << "cf_imu_icm20689_acc_T[2][2]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[2][2] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[0][0]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[0][0] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[0][1]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[0][1] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[0][2]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[0][2] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[1][0]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[1][0] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[1][1]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[1][1] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[1][2]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[1][2] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[2][0]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[2][0] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[2][1]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[2][1] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[2][2]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[2][2] <<std::endl;
 
     
     gc_camd1.gc_ros.cf_ros_showimage = ce_config_get_cf_int_para(&settingsList, "cf_ros_showimage");
-    std::cout << "cf_ros_showimage: " << gc_camd1.gc_ros.cf_ros_showimage <<std::endl;
+    CE_COUT << "cf_ros_showimage: " << gc_camd1.gc_ros.cf_ros_showimage <<std::endl;
     
     gc_camd1.gc_ste.cf_ste_algorithm = ce_config_get_cf_int_para(&settingsList, "cf_ste_algorithm");
-    std::cout << "cf_ste_algorithm: " << gc_camd1.gc_ste.cf_ste_algorithm <<std::endl;
+    CE_COUT << "cf_ste_algorithm: " << gc_camd1.gc_ste.cf_ste_algorithm <<std::endl;
     
 
     
@@ -385,27 +399,27 @@ void  ce_config_rst_imu_offset(void)
     gc_camd1.gc_imu.cf_imu_icm20689_sample_rate = 1000;
     
 
-    std::cout << "-----------------------------"<<std::endl;
-    std::cout << "celog: begien the cali IMU..." <<std::endl;
-    std::cout << "celog: reset all the bias and scale..." <<std::endl;
-    std::cout << "cf_imu_acc_bias_X: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_X <<std::endl;
-    std::cout << "cf_imu_acc_bias_Y: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_Y <<std::endl;
-    std::cout << "cf_imu_acc_bias_Z: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_Z <<std::endl;
-    std::cout << "cf_imu_gyro_bias_X: " << gc_camd1.gc_imu.cf_imu_icm20689_gyro_bias_X <<std::endl;
-    std::cout << "cf_imu_gyro_bias_Y: " << gc_camd1.gc_imu.cf_imu_icm20689_gyro_bias_Y <<std::endl;
-    std::cout << "cf_imu_gyro_bias_Z: " << gc_camd1.gc_imu.cf_imu_icm20689_gyro_bias_Z <<std::endl;
+    CE_COUT << "-----------------------------"<<std::endl;
+    CE_COUT << "celog: begien the cali IMU..." <<std::endl;
+    CE_COUT << "celog: reset all the bias and scale..." <<std::endl;
+    CE_COUT << "cf_imu_acc_bias_X: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_X <<std::endl;
+    CE_COUT << "cf_imu_acc_bias_Y: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_Y <<std::endl;
+    CE_COUT << "cf_imu_acc_bias_Z: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_Z <<std::endl;
+    CE_COUT << "cf_imu_gyro_bias_X: " << gc_camd1.gc_imu.cf_imu_icm20689_gyro_bias_X <<std::endl;
+    CE_COUT << "cf_imu_gyro_bias_Y: " << gc_camd1.gc_imu.cf_imu_icm20689_gyro_bias_Y <<std::endl;
+    CE_COUT << "cf_imu_gyro_bias_Z: " << gc_camd1.gc_imu.cf_imu_icm20689_gyro_bias_Z <<std::endl;
 
-    std::cout << "cf_imu_icm20689_acc_T[0][0]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[0][0] <<std::endl;
-    std::cout << "cf_imu_icm20689_acc_T[0][1]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[0][1] <<std::endl;
-    std::cout << "cf_imu_icm20689_acc_T[0][2]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[0][2] <<std::endl;
-    std::cout << "cf_imu_icm20689_acc_T[1][0]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[1][0] <<std::endl;
-    std::cout << "cf_imu_icm20689_acc_T[1][1]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[1][1] <<std::endl;
-    std::cout << "cf_imu_icm20689_acc_T[1][2]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[1][2] <<std::endl;
-    std::cout << "cf_imu_icm20689_acc_T[2][0]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[2][0] <<std::endl;
-    std::cout << "cf_imu_icm20689_acc_T[2][1]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[2][1] <<std::endl;
-    std::cout << "cf_imu_icm20689_acc_T[2][2]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[2][2] <<std::endl;
-    std::cout << "cf_imu_icm20689_sample_rate " << gc_camd1.gc_imu.cf_imu_icm20689_sample_rate <<std::endl;
-    std::cout << "-----------------------------"<<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[0][0]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[0][0] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[0][1]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[0][1] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[0][2]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[0][2] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[1][0]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[1][0] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[1][1]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[1][1] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[1][2]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[1][2] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[2][0]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[2][0] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[2][1]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[2][1] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[2][2]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[2][2] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_sample_rate " << gc_camd1.gc_imu.cf_imu_icm20689_sample_rate <<std::endl;
+    CE_COUT << "-----------------------------"<<std::endl;
 }
 
 
@@ -421,27 +435,27 @@ void  ce_config_rewrite_imu_offset(std::string filepath, float *gyro_offs, float
 
     memcpy(gc_camd1.gc_imu.cf_imu_icm20689_acc_T, accel_T, sizeof(gc_camd1.gc_imu.cf_imu_icm20689_acc_T));
 
-    std::cout << "----------------------------------------------------"<<std::endl;
-    std::cout << "set cf float: " <<std::endl;
+    CE_COUT << "----------------------------------------------------"<<std::endl;
+    CE_COUT << "set cf float: " <<std::endl;
     
-    std::cout << "cf_imu_gyro_bias_X: " << gc_camd1.gc_imu.cf_imu_icm20689_gyro_bias_X <<std::endl;
-    std::cout << "cf_imu_gyro_bias_Y: " << gc_camd1.gc_imu.cf_imu_icm20689_gyro_bias_Y <<std::endl;
-    std::cout << "cf_imu_gyro_bias_Z: " << gc_camd1.gc_imu.cf_imu_icm20689_gyro_bias_Z <<std::endl;
+    CE_COUT << "cf_imu_gyro_bias_X: " << gc_camd1.gc_imu.cf_imu_icm20689_gyro_bias_X <<std::endl;
+    CE_COUT << "cf_imu_gyro_bias_Y: " << gc_camd1.gc_imu.cf_imu_icm20689_gyro_bias_Y <<std::endl;
+    CE_COUT << "cf_imu_gyro_bias_Z: " << gc_camd1.gc_imu.cf_imu_icm20689_gyro_bias_Z <<std::endl;
     
-    std::cout << "cf_imu_acc_bias_X: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_X <<std::endl;
-    std::cout << "cf_imu_acc_bias_Y: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_Y <<std::endl;
-    std::cout << "cf_imu_acc_bias_Z: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_Z <<std::endl;
+    CE_COUT << "cf_imu_acc_bias_X: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_X <<std::endl;
+    CE_COUT << "cf_imu_acc_bias_Y: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_Y <<std::endl;
+    CE_COUT << "cf_imu_acc_bias_Z: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_Z <<std::endl;
 
 
-    std::cout << "cf_imu_icm20689_acc_T[0][0]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[0][0] <<std::endl;
-    std::cout << "cf_imu_icm20689_acc_T[0][1]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[0][1] <<std::endl;
-    std::cout << "cf_imu_icm20689_acc_T[0][2]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[0][2] <<std::endl;
-    std::cout << "cf_imu_icm20689_acc_T[1][0]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[1][0] <<std::endl;
-    std::cout << "cf_imu_icm20689_acc_T[1][1]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[1][1] <<std::endl;
-    std::cout << "cf_imu_icm20689_acc_T[1][2]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[1][2] <<std::endl;
-    std::cout << "cf_imu_icm20689_acc_T[2][0]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[2][0] <<std::endl;
-    std::cout << "cf_imu_icm20689_acc_T[2][1]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[2][1] <<std::endl;
-    std::cout << "cf_imu_icm20689_acc_T[2][2]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[2][2] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[0][0]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[0][0] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[0][1]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[0][1] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[0][2]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[0][2] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[1][0]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[1][0] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[1][1]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[1][1] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[1][2]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[1][2] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[2][0]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[2][0] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[2][1]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[2][1] <<std::endl;
+    CE_COUT << "cf_imu_icm20689_acc_T[2][2]: " << gc_camd1.gc_imu.cf_imu_icm20689_acc_T[2][2] <<std::endl;
 
 
     ce_config_set_cf_float_para(filepath,"cf_imu_icm20689_acc_bias_X",gc_camd1.gc_imu.cf_imu_icm20689_acc_bias_X);
@@ -463,8 +477,8 @@ void  ce_config_rewrite_imu_offset(std::string filepath, float *gyro_offs, float
     ce_config_set_cf_float_para(filepath, "cf_imu_icm20689_acc_T[2][2]",gc_camd1.gc_imu.cf_imu_icm20689_acc_T[2][2]);
 
 
-    std::cout << "celog: writ the answer to the config success..." <<std::endl;
-    std::cout << "----------------------------------------------------"<<std::endl;
+    CE_COUT << "celog: writ the answer to the config success..." <<std::endl;
+    CE_COUT << "----------------------------------------------------"<<std::endl;
 }
 
 

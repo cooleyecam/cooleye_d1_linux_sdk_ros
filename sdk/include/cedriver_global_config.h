@@ -10,7 +10,8 @@
 
 #define SUCCESS     0
 #define ERROR       -1
-
+#define ERROR_LOST_LEFT_CAM       -2
+#define ERROR_LOST_RIGHT_CAM       -3
 
 //////////////////////////////////////////////////////////////////////////
 //////   CAM D1  USB setting
@@ -47,7 +48,18 @@
 #define CAMD1_LEFT      0xF1
 #define CAMD1_RIGHT     0xF0
 
+#define CAMS1_00      0xB0
+#define CAMS1_01      0xB1
+#define CAMS1_02      0xB2
+#define CAMS1_03      0xB3
+#define CAMS1_04      0xB4
+#define CAMS1_05      0xB5
+#define CAMS1_06      0xB6
+#define CAMS1_07      0xB7
+#define CAMS1_MIN     CAMS1_00
+#define CAMS1_MAX     CAMS1_07
 
+#define CE_GET_CAM_L_R_STRING(n) n==CAMD1_LEFT ? "left" : n==CAMD1_RIGHT ? "right" : "unknown"
 
 #define CAMD1_RESOLUTION_VGA 1
 #define CAMD1_RESOLUTION_WVGA 2
@@ -55,7 +67,17 @@
 #define CAMD1_LEFT_ENABLE   0x01
 #define CAMD1_RIGHT_ENABLE   0x02
 
+/*DEVICE ID MACRO*/
+#define CE_DEVICEID_LEN  16
+#define CE_DEVICEID_MEMORY_ADDR  0xFF00
 
+#define CE_CAM_TYPE_D '1'
+#define CE_CAM_TYPE_S '3'
+
+#define CE_CAM_SUB_TYPE_D1_V1P6 "001"
+#define CE_CAM_SUB_TYPE_S1_V2P0 "001"
+
+#define CE_CAM_SERIAL_LEN 5
 
 /*PARAMETER MACRO*/
 #define IMG_WIDTH_VGA   640
@@ -79,6 +101,7 @@
 
 #define CAM_I2C_R           0xA7
 #define CAM_I2C_W           0xA8
+#define CAM_DEVICEID        0xA9
 #define auto_expo           1
 #define EXP_VAL             50
 #define GAI_VAL             100
