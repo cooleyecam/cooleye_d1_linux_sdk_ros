@@ -18,14 +18,20 @@
 #include "cedriver_config.h"
 #include "logmsg.h"
 
-int g_nCtrl;
+int g_nCtrl = 1;
 
 void SIGINTHandler(int nSig)
 {
     if(0 != g_nCtrl)
+    {
         g_nCtrl = 0;
+        printf("SIGINTHandler: g_nCtrl = %d\r\n", g_nCtrl);
+    }
     else
+    {
         g_nCtrl = 1;
+        printf("SIGINTHandler: g_nCtrl = %d\r\n", g_nCtrl);
+    }
 }
 
 int main(int argc, char* argv[])
@@ -86,15 +92,17 @@ int main(int argc, char* argv[])
         WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "ce_cam_capture_init success \r\n");
     }
 
-    g_nCtrl = 1;
     while(g_nCtrl)
     {
         sleep(1);
     }
 
+#if 0
     ce_imu_capture_close();
     ce_imu_showdata_close();
-    ce_cam_capture_close();
+#endif
+
+    //ce_cam_capture_close();
     ce_cam_showimg_close();
 
     FINI_LOG();

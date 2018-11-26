@@ -447,16 +447,16 @@ static void *ce_cam_capture(void *pUserPara)
         {
             //LOG("cam %d bulk transfer returned: %d\n",camlr,r);
             error_count++;
-            if (error_count >= 50)
+            if (error_count >= 1000)
             {
                 if(CAMD1_LEFT == camlr)
                 {
-                    ce_camd1l_capture_thread = 0;
+                    //ce_camd1l_capture_thread = 0;
                     ce_cam_read_error_flag_left = true;
                 }
                 else if(CAMD1_RIGHT == camlr)
                 {
-                    ce_camd1r_capture_thread = 0;
+                    //ce_camd1r_capture_thread = 0;
                     ce_cam_read_error_flag_right = true;
                 }
 
@@ -480,15 +480,12 @@ static void *ce_cam_capture(void *pUserPara)
         if((pass == 1)&&(ce_cam_rst_flag_left == false)&&(ce_cam_rst_flag_right == false))
         {
             error_count = 0;
-
             img_pkg *timg_pkg_giveup = NULL;
 
             if (0 == tlist->push(timg_pkg, timg_pkg_giveup, 30))
             {
                 delete timg_pkg_giveup;
             }
-
-
         }
         else
         {
@@ -500,7 +497,7 @@ static void *ce_cam_capture(void *pUserPara)
         }
     }
 
-
+#if 0
     if(CAMD1_LEFT == camlr)
     {
         ce_camd1l_capture_thread = 0;
@@ -511,6 +508,7 @@ static void *ce_cam_capture(void *pUserPara)
     }
 
     pthread_exit(NULL);
+#endif
 }
 
 static void ce_cam_get_soft_version(int camlr)
@@ -980,7 +978,7 @@ int ce_cam_capture_init()
             int r_num = libusb_control_transfer(pusb_handle,RT_D2H,GET_CAM_LR,0,0,&buf,1,1000);
             if(r_num != 1)
             {
-                LOG("celog: Get the device LR addr failed");
+                WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "ce_cam_capture_init: Get the device LR addr failed\r\n");
             }
             else
             {
@@ -1060,14 +1058,14 @@ int ce_cam_capture_init()
         ce_usb_close();
     }
 
-    usleep(1000);
+    WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "ce_cam_capture_init finish\r\n");
     return SUCCESS;
 }
 
 void ce_cam_capture_close()
 {
     ce_cam_capture_stop_run=true;
-    usleep(100);
+    sleep(1);
     if(ce_camd1l_capture_thread !=0)
     {
         pthread_join(ce_camd1l_capture_thread,NULL);

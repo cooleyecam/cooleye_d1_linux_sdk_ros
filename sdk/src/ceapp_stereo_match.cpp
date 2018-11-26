@@ -46,23 +46,23 @@ int g_nCtrl = 1;
 static void* ce_ste_match(void *)
 {
     ce_config_get_cf_cam_rectify_force_on();
-    
+
     cv::Mat img_left(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
     cv::Mat img_right(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
 
     cv::Mat disparity(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
     cv::Mat result_rect;
-    
+
     Mat Q;
     Mat xyz;
     Mat disp, disp8;
     Rect roi1, roi2;
 
     Mat disRGB;
-    
+
     Ptr<StereoBM> bm = StereoBM::create(16,9);
     Ptr<StereoSGBM> sgbm = StereoSGBM::create(0,16,3);
-    
+
     ////////////////////////////////////////////////////////////////////////////////////
     enum { STEREO_BM=0, STEREO_SGBM=1, STEREO_HH=2, STEREO_VAR=3, STEREO_3WAY=4 };
     int alg = STEREO_SGBM;
@@ -73,8 +73,8 @@ static void* ce_ste_match(void *)
 
     alg = ce_config_get_cf_ste_algorithm();
 
-    
-    numberOfDisparities = 128;    
+
+    numberOfDisparities = 128;
     SADWindowSize =15;
     scale = 1.0;
     no_display = false;
@@ -120,10 +120,10 @@ static void* ce_ste_match(void *)
     sgbm->setMode(StereoSGBM::MODE_SGBM);
     else if(alg==STEREO_3WAY)
     sgbm->setMode(StereoSGBM::MODE_SGBM_3WAY);
-      
+
     ///////////////////////////////////////////////////////////
-    
-    
+
+
     d1_img_output_pkg *img_lr_pkg;
 
     while(!ce_ste_match_stop_run)
@@ -141,21 +141,21 @@ static void* ce_ste_match(void *)
                 delete img_lr_pkg;
                 continue;
         }
-            
+
         // get the image
         memcpy(img_left.data, img_lr_pkg->left_img->data, ce_config_get_cf_img_size());
         memcpy(img_right.data,img_lr_pkg->right_img->data,ce_config_get_cf_img_size());
-        
+
 
         img1 = img_left;
         img2 = img_right;
-        
+
         int64 t = getTickCount();
         if( alg == STEREO_BM )
             bm->compute(img1, img2, disp);
         else if( alg == STEREO_SGBM || alg == STEREO_HH || alg == STEREO_3WAY )
             sgbm->compute(img1, img2, disp);
-    
+
         t = getTickCount() - t;
         printf("Time elapsed: %fms\n", t*1000/getTickFrequency());
 
@@ -164,18 +164,18 @@ static void* ce_ste_match(void *)
             disp.convertTo(disp8, CV_8U, 255/(numberOfDisparities*16.));
         else
             disp.convertTo(disp8, CV_8U);
-    
-        //reprojectImageTo3D(disp, xyz, Q, true);   
+
+        //reprojectImageTo3D(disp, xyz, Q, true);
         //imshow("xyz", xyz);
-        
+
         ce_merge_img(result_rect, img_left, img_right);
-        
+
         cv::imshow("result_rect",result_rect);
 
         imshow("disparity", disp8);
         ce_depth2color(disRGB, disp8, 255, 0);
         imshow("disRGB", disRGB);
-    
+
         cv::waitKey(1);
 
         delete img_lr_pkg->left_img;
@@ -224,7 +224,7 @@ void SIGINTHandler(int nSig)
 int main(int argc, char* argv[])
 {
     signal(SIGINT, SIGINTHandler);
-    
+    g_nCtrl = 1;
     ce_config_load_settings("../config/cecfg_std.txt");
 
     int fd = ce_imu_capture_init();
@@ -271,19 +271,17 @@ int main(int argc, char* argv[])
         }
     }
 
-    g_nCtrl = 1;
-    
     while(g_nCtrl)
     {
         sleep(100);
     }
 
     ce_imu_capture_close();
-    
+
     ce_imu_showdata_close();
 
     ce_cam_capture_close();
-    
+
     ce_ste_match_close();
     return 0;
 }
