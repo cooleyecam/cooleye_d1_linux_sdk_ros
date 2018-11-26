@@ -55,7 +55,8 @@ threadsafe_queue<img_pkg *> img_pkg_left_list;
 threadsafe_queue<img_pkg *> img_pkg_right_list;
 threadsafe_queue<d1_img_output_pkg *> img_pkg_list_d1;
 
-
+int ce_cam_read_error_flag_left = false;
+int ce_cam_read_error_flag_right = false;
 
 bool ce_cam_rst_flag_left = false;
 bool ce_cam_rst_flag_right = false;
@@ -118,14 +119,14 @@ static int ce_cam_i2c_write(int cam_num, unsigned char reg,int value)
     int r = libusb_control_transfer(ce_cam_get_cam_handle(cam_num),RT_D2H,CAM_I2C_W,(CAM_I2C_ADDR<<8)+reg,value,buf,1,1000);
     if(r != 1)
     {
-        LOG("celog: cam%d,i:0x%02X,r:%d\r\n",cam_num,CAM_I2C_W,r);
+        WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "ce_cam_i2c_write error cam%d, i:0x%02X, r:%d, point:%p\r\n",cam_num,CAM_I2C_W,r, ce_cam_get_cam_handle(cam_num));
         ret = ERROR;
         return ret;
     }
-    
+
     if(buf[0] != SUCCESS)
     {
-        LOG("celog: I2C Write failed.  Cam:%d, Addr:0x%02X, Reg:0x%02X, Write:0x%04X, I2C_return:%d\r\n",cam_num,CAM_I2C_ADDR,reg,value,buf[0]);
+        WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "ce_cam_i2c_write error Cam:%d, Addr:0x%02X, Reg:0x%02X, Write:0x%04X, I2C_return:%d\r\n",cam_num,CAM_I2C_ADDR,reg,value,buf[0]);
         ret = ERROR;
         return ret;
     }
@@ -133,7 +134,7 @@ static int ce_cam_i2c_write(int cam_num, unsigned char reg,int value)
 }
 
 static int ce_cam_i2c_readrom(int cam_num, unsigned char *buf)
-{    
+{
     int ret = SUCCESS;
     int r = libusb_control_transfer(ce_cam_get_cam_handle(cam_num), RT_D2H, CAM_DEVICEID, CE_DEVICEID_MEMORY_ADDR, 0, buf, CE_DEVICEID_LEN, 1000);
     if(r != CE_DEVICEID_LEN)
@@ -142,14 +143,14 @@ static int ce_cam_i2c_readrom(int cam_num, unsigned char *buf)
         ret = ERROR;
         return ret;
     }
- 
+
 #if 0
     LOG("read cam %s deviceid: ", CE_GET_CAM_L_R_STRING(cam_num));
     for(int i=0; i<CE_DEVICEID_LEN; i++)
     {
         LOG("%X ",buf[i]);
     }
-    
+
     LOG("\r\n");
 #endif
 
@@ -200,26 +201,26 @@ static int ce_cam_sync_rst(int camlr)
     }
 
     while( (!ce_cam_rst_flag_left)||(!ce_cam_rst_flag_right));
-    
+
 
     usleep(100000);
-    
+
     ce_cam_i2c_write(camlr,0x0C,0x0001);
     ce_cam_ctrl_camera(camlr,STANDBY_SHORT);
-    
+
     if(CAMD1_LEFT == camlr)
         ce_cam_rst_flag_left = false;
     else if(CAMD1_RIGHT == camlr)
         ce_cam_rst_flag_right = false;
-    
+
     return SUCCESS;
 }
 
 
 static int ce_cam_sync_rst_bulk(int camlr)
 {
-    
-    
+
+
     if(CAMD1_LEFT == camlr)
         ce_cam_rst_flag_left = true;
     else if(CAMD1_RIGHT == camlr)
@@ -230,21 +231,21 @@ static int ce_cam_sync_rst_bulk(int camlr)
         return ERROR;
     }
 
-    
-    
+
+
     while( (!ce_cam_rst_flag_left)||(!ce_cam_rst_flag_right));
-    
+
 
     usleep(1000);
-    
+
     ce_cam_i2c_write(camlr,0x0C,0x0001);
     ce_cam_ctrl_camera(camlr,STANDBY_SHORT);
-    
+
     if(CAMD1_LEFT == camlr)
         ce_cam_rst_flag_left = false;
     else if(CAMD1_RIGHT == camlr)
         ce_cam_rst_flag_right = false;
-    
+
     return SUCCESS;
 }
 
@@ -252,88 +253,88 @@ static int ce_cam_sync_rst_bulk(int camlr)
 
 static void ce_cam_set_mt9v034_config_default(int camlr)
 {
-    
+
     usleep(10000);
     ce_cam_i2c_write(camlr,0x07,0x0188);
- 
+
     // CONTEXT A
     ce_cam_i2c_write(camlr,0x04,0x02F0);    // 720X480
     ce_cam_i2c_write(camlr,0x03,0x01E0);
     ce_cam_i2c_write(camlr,0x05,0x0106);    // HB
     ce_cam_i2c_write(camlr,0x06,0x024B);    // VB
-    
-    ce_cam_i2c_write(camlr,0x0D,0x0300);     
-    
+
+    ce_cam_i2c_write(camlr,0x0D,0x0300);
+
     ce_cam_i2c_write(camlr,0x01,0x0001);
     ce_cam_i2c_write(camlr,0x02,0x0004);
     ce_cam_i2c_write(camlr,0x08,0x01BB);
     ce_cam_i2c_write(camlr,0x09,0x01D9);
     ce_cam_i2c_write(camlr,0x0A,0x0164);
-    
+
     // CONTEXT B
     ce_cam_i2c_write(camlr,0xCC,0x02F0);
     ce_cam_i2c_write(camlr,0xCB,0x01E0);
     ce_cam_i2c_write(camlr,0xCD,0x0106);
     ce_cam_i2c_write(camlr,0xCE,0x024B);
-    
+
     ce_cam_i2c_write(camlr,0x0E,0x0300);
-    
+
     ce_cam_i2c_write(camlr,0xC9,0x0001);
     ce_cam_i2c_write(camlr,0xCA,0x0004);
     ce_cam_i2c_write(camlr,0xCF,0x01BB);
     ce_cam_i2c_write(camlr,0xD0,0x01D9);
     ce_cam_i2c_write(camlr,0xD1,0x0164);
-    
-    
-    
+
+
+
     ce_cam_i2c_write(camlr,0x70,0x0303);
-    
+
     ce_cam_set_af_mode(camlr);
-    
+
     ce_cam_i2c_write(camlr,0x0F,0x0000);
     ce_cam_i2c_write(camlr,0xAC,0x0001);
     ce_cam_i2c_write(camlr,0xAD,0x01E0);
     ce_cam_i2c_write(camlr,0xAB,0x0040);
-    ce_cam_i2c_write(camlr,0xB0,0xFFFF);    
+    ce_cam_i2c_write(camlr,0xB0,0xFFFF);
     ce_cam_i2c_write(camlr,0xA5,0x0037);
     ce_cam_i2c_write(camlr,0x1C,0x0202);
-    ce_cam_i2c_write(camlr,0x7F,0x0000);    
+    ce_cam_i2c_write(camlr,0x7F,0x0000);
     ce_cam_i2c_write(camlr,0xA6,0x0001);
     ce_cam_i2c_write(camlr,0xA8,0x0000);
     ce_cam_i2c_write(camlr,0xA9,0x0000);
     ce_cam_i2c_write(camlr,0xAA,0x0000);
 
-    
+
     ce_cam_i2c_write(camlr,0x34,0x0003);
     ce_cam_i2c_write(camlr,0x3c,0x0003);
     ce_cam_i2c_write(camlr,0x2c,0x0004);
-    
+
 
     ce_cam_i2c_write(camlr,0x25,0x0020);
     ce_cam_i2c_write(camlr,0xC2,0x0840);
-    
+
     ce_cam_i2c_write(camlr,0x0C,0x0001);
-    
+
     ce_cam_i2c_write(camlr,0x47,0x0080);
     ce_cam_i2c_write(camlr,0x48,0x0000);
     ce_cam_i2c_write(camlr,0x4C,0x0002);
-    
+
     ce_cam_i2c_write(camlr,0x35,0x0028);
     ce_cam_i2c_write(camlr,0x36,0x0028);
-    
+
     ce_cam_i2c_write(camlr,0xA5,0x0030);
     ce_cam_i2c_write(camlr,0xAD,0x01E0);
     ce_cam_i2c_write(camlr,0xAB,0x0040);
-    
+
 //     ce_cam_i2c_write(camlr,0x72,0x0010);
 //     /*recommended register setting and performance impact   PDF-page14*/
-// 
+//
 //     ce_cam_i2c_write(camlr,0x20,0x03C7);
 //     ce_cam_i2c_write(camlr,0x24,0x001B);
 //     ce_cam_i2c_write(camlr,0x2B,0x0003);
 //     ce_cam_i2c_write(camlr,0x2F,0x0003);
 
-    
+
 }
 
 
@@ -348,10 +349,10 @@ static void ce_cam_set_mt9v034_fps(int camlr)
 
 static void ce_cam_set_mt9v034_EG_mode(int camlr)
 {
-    
+
    switch (ce_config_get_cf_cam_EG_mode())
     {
-    case 0:                         
+    case 0:
         ce_cam_i2c_write(camlr,0xAF,0x00);      //AEC
         ce_cam_i2c_write(camlr,0x0B,ce_config_get_cf_cam_man_exp());   //Exposure Time
         ce_cam_i2c_write(camlr,0x35,ce_config_get_cf_cam_man_gain());  //Gain
@@ -391,10 +392,11 @@ static void ce_cam_set_mt9v034_EG_mode(int camlr)
 static void *ce_cam_capture(void *pUserPara)
 {
     int camlr = *(int *)pUserPara;
+    usleep(1000);
     ce_cam_set_mt9v034_config_default(camlr);
- 
+
     ce_cam_set_mt9v034_fps(camlr);
-    
+
     ce_cam_set_mt9v034_EG_mode(camlr);
 
     ce_cam_ctrl_camera(camlr,SET_MCLK_48MHz);
@@ -410,14 +412,17 @@ static void *ce_cam_capture(void *pUserPara)
 
     img_pkg *timg_pkg;
     threadsafe_queue<img_pkg *> *tlist;
+    int error_count = 0;
 
     if(CAMD1_LEFT == camlr)
     {
         tlist = &img_pkg_left_list;
+        ce_cam_read_error_flag_left = false;
     }
     else if(CAMD1_RIGHT == camlr)
     {
         tlist = &img_pkg_right_list;
+        ce_cam_read_error_flag_right = false;
     }
 
 
@@ -429,7 +434,7 @@ static void *ce_cam_capture(void *pUserPara)
         timg_pkg = new img_pkg;
         if (NULL == timg_pkg)
         {
-            LOG("ce_cam_capture alloc memory failure! exit thread!\r\n");
+            WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "ce_cam_capture ce_cam_capture alloc memory failure! exit thread!\r\n");
             break;
         }
 
@@ -440,7 +445,31 @@ static void *ce_cam_capture(void *pUserPara)
 
         if(r)
         {
-            LOG("cam %d bulk transfer returned: %d\n",camlr,r);
+            //LOG("cam %d bulk transfer returned: %d\n",camlr,r);
+            error_count++;
+            if (error_count >= 50)
+            {
+                if(CAMD1_LEFT == camlr)
+                {
+                    ce_camd1l_capture_thread = 0;
+                    ce_cam_read_error_flag_left = true;
+                }
+                else if(CAMD1_RIGHT == camlr)
+                {
+                    ce_camd1r_capture_thread = 0;
+                    ce_cam_read_error_flag_right = true;
+                }
+
+                delete timg_pkg;
+                timg_pkg = NULL;
+                pthread_exit(NULL);
+            }
+            else
+            {
+                delete timg_pkg;
+                timg_pkg = NULL;
+                continue;
+            }
         }
 
         pass = (timg_pkg->data[ce_config_get_cf_img_size()+0]==0xFF
@@ -450,6 +479,7 @@ static void *ce_cam_capture(void *pUserPara)
 
         if((pass == 1)&&(ce_cam_rst_flag_left == false)&&(ce_cam_rst_flag_right == false))
         {
+            error_count = 0;
 
             img_pkg *timg_pkg_giveup = NULL;
 
@@ -457,20 +487,20 @@ static void *ce_cam_capture(void *pUserPara)
             {
                 delete timg_pkg_giveup;
             }
-                    
+
 
         }
         else
         {
             delete timg_pkg;
             timg_pkg = NULL;
-            LOG("cam %d bulk transfer check failed: %d\n",camlr,r);
-            
+            WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "ce_cam_capture cam %d bulk transfer check failed: %d\n",camlr,r);
+
             ce_cam_ctrl_camera(camlr,SET_MCLK_48MHz);
         }
     }
-    
-    
+
+
     if(CAMD1_LEFT == camlr)
     {
         ce_camd1l_capture_thread = 0;
@@ -483,12 +513,10 @@ static void *ce_cam_capture(void *pUserPara)
     pthread_exit(NULL);
 }
 
-
-
 static void ce_cam_get_soft_version(int camlr)
 {
     unsigned char ver_buf[30];
- 
+
     int j = libusb_control_transfer(ce_cam_get_cam_handle(camlr),RT_D2H,GET_THE_SOFT_VISION,0,0,ver_buf,30,1000);
     if(CAMD1_LEFT == camlr)
     {
@@ -498,8 +526,8 @@ static void ce_cam_get_soft_version(int camlr)
     {
         LOG("celog: the right cam version :");
     }
-    
-    
+
+
     for(int i = 0; i< j; i++)
     {
         LOG("%c",ver_buf[i]);
@@ -517,26 +545,26 @@ int ce_get_cam_serial_from_log(int *serial_D, int *serial_S)
         std::cerr << "celog: opening file failed -- "<<CE_CAM_SERIAL_FILE_NAME <<std::endl;
         exit(EXIT_FAILURE);
     }
-    
-    std::string line;    
+
+    std::string line;
     while(getline(serialFile, line))
     {
         if(line.at(0)!='#')
         {
             const char *ptr = line.c_str();
-            
+
             if (0 == strncmp(ptr, "serial_D=", strlen("serial_D=")))
             {
                 *serial_D = atoi(ptr+strlen("serial_D="));
             }
-            
+
             if (0 == strncmp(ptr, "serial_S=", strlen("serial_S=")))
             {
                 *serial_S = atoi(ptr+strlen("serial_S="));
-            }                        
+            }
         }
     }
-    
+
     serialFile.close();
     return 0;
 }
@@ -552,7 +580,7 @@ int ce_set_cam_serial_to_log(int serial_D, int serial_S)
 
     serialFile<<"serial_D="<<serial_D<<std::endl;
     serialFile<<"serial_S="<<serial_S<<std::endl;
-    
+
     serialFile.close();
     return 0;
 }
@@ -561,12 +589,12 @@ int ce_cam_check_deviceid(char *buf, int *serial)
 {
     if (buf[0] != 'E' || buf[1] != 'C' || buf[2] != 'A')
         return ERROR;
-    
+
     char tmpBuf[10] = {0};
     strncpy(tmpBuf, &buf[7], CE_CAM_SERIAL_LEN);
-    
+
     *serial = atoi(tmpBuf);
-    
+
     return SUCCESS;
 }
 
@@ -574,22 +602,22 @@ int ce_cam_build_deviceid(char *buf, char type, char *subType, int camlr, int ca
 {
     memset(buf, 0, CE_DEVICEID_LEN);
     char *cur = buf;
-    
+
     /*format serial*/
     char serial[10] = {0};
     sprintf(serial, "%05d", camSerial);
-  
+
     /* class 1: ECA */
     buf[0] = 'E';//E
     buf[1] = 'C';//C
     buf[2] = 'A';//A
-    
+
     /* class 2: type */
     buf[3] = type;
-    
+
     /* class 3: sub type */
     strncat(buf, subType, 3);
-            
+
     /* class 4: Serial Number */
     strncat(buf, serial, CE_CAM_SERIAL_LEN);
 
@@ -601,34 +629,34 @@ int ce_cam_build_deviceid(char *buf, char type, char *subType, int camlr, int ca
         buf[len] = 'R';
     else
         buf[len] = '0';
-    
+
     return 0;
 }
 
 int ce_cam_write_deviceid_S1()
-{    
+{
     int ret;
     int usbNumber;
     bool newCamFalg = true;
     ce_get_cam_serial_from_log(&g_nCamSerial_D, &g_nCamSerial_S);
-    
+
     g_nCtrl = 1;
     while(g_nCtrl)
     {
         pcaml_handle = NULL;
-        pcamr_handle = NULL;  
+        pcamr_handle = NULL;
         ret = SUCCESS;
-        
+
         usbNumber = ce_usb_open();
         if(usbNumber < 1)
-        {            
-            ret = ERROR;                     
+        {
+            ret = ERROR;
         }
         else
-        {            
+        {
             WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "发现ＵＳＢ设备, 数量: %d\r\n", usbNumber);
         }
-        
+
         libusb_device_handle *pusb_handle;
         for(int i = 0; i < usbNumber; i++)
         {
@@ -641,7 +669,7 @@ int ce_cam_write_deviceid_S1()
                 ret= ERROR;
             }
             else if (CAMS1_MIN <= buf && CAMS1_MAX >= buf)
-            {                                                
+            {
                 pcaml_handle = pusb_handle;
             }
             else
@@ -649,8 +677,8 @@ int ce_cam_write_deviceid_S1()
                 ret= ERROR;
             }
         }
-        
- 
+
+
         if(ERROR == ret)
         {
             LOG("未检测到摄像头,请插入ＵＳＢ设备\r\n");
@@ -658,14 +686,14 @@ int ce_cam_write_deviceid_S1()
         else
         {
             int temp = 0;
-            static int caml_addr = CAMS1_00;             
-            
+            static int caml_addr = CAMS1_00;
+
 #if 1
             // pre check cam left deviceid
-            char readbufL[16] = {0};            
-            bool readbufL_flag = false;            
+            char readbufL[16] = {0};
+            bool readbufL_flag = false;
             int readbufL_serial = 0;
-                        
+
             if (SUCCESS == ce_cam_i2c_readrom(caml_addr, (unsigned char *)readbufL))
             {
                 if (SUCCESS == ce_cam_check_deviceid(readbufL, &readbufL_serial))
@@ -682,7 +710,7 @@ int ce_cam_write_deviceid_S1()
             {
                 LOG("read left cam deviceid fail!\r\n");
             }
-            
+
             if ((readbufL_flag && !g_nForceWriteFlag) ||    //已写入，且非强制写入模式
                 (readbufL_flag && readbufL_serial == g_nCamSerial_S - 1)) //前一次刚写入
             {
@@ -691,11 +719,11 @@ int ce_cam_write_deviceid_S1()
             else if(readbufL_flag && readbufL_serial == g_nCamSerial_S) //g_nCamSerial_S = 1,readbufL_serial = 1
             {
                 WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "该摄像头已有设备编号,请换其他摄像头\r\n");
-                
+
                 g_nCamSerial_S++;
                 if (g_nCamSerial_S > 99999)
                     g_nCamSerial_S = 1;
-                
+
                 ce_set_cam_serial_to_log(g_nCamSerial_D, g_nCamSerial_S);
             }
             else
@@ -703,49 +731,49 @@ int ce_cam_write_deviceid_S1()
                 //printf("------------- %d %d %d %d %d %d\r\n", readbufL_flag, readbufR_flag, readbufL_serial, readbufR_serial, g_nCamSerial_D, g_nForceWriteFlag);
                 char writebufL[16] = {0};
                 bool writebufL_flag = false;
-            
+
                 /* write left cam deviceid */
-                ce_cam_build_deviceid(writebufL, CE_CAM_TYPE_S, CE_CAM_SUB_TYPE_S1_V2P0, CAMS1_00, g_nCamSerial_S);                
+                ce_cam_build_deviceid(writebufL, CE_CAM_TYPE_S, CE_CAM_SUB_TYPE_S1_V2P0, CAMS1_00, g_nCamSerial_S);
                 if(SUCCESS == ce_cam_i2c_writerom(caml_addr, (unsigned char *)writebufL))
                 {
                      WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "重新写入左摄像头编号: %s\r\n", writebufL);
                     writebufL_flag = true;
                 }
-                
+
                 if (writebufL_flag)
                 {
                     g_nCamSerial_S++;
                     if (g_nCamSerial_S > 99999)
                         g_nCamSerial_S = 1;
-                    
+
                     ce_set_cam_serial_to_log(g_nCamSerial_D, g_nCamSerial_S);
                 }
             }
-            LOG("\r\n");            
+            LOG("\r\n");
 #endif
         }
-        
+
         sleep(1);
-        ce_usb_close();    
+        ce_usb_close();
     }
-    
+
     return SUCCESS;
 }
 
 int ce_cam_write_deviceid_D1()
-{    
+{
     int ret;
     int usbNumber;
     bool newCamFalg = true;
     ce_get_cam_serial_from_log(&g_nCamSerial_D, &g_nCamSerial_S);
-    
+
     g_nCtrl = 1;
     while(g_nCtrl)
     {
         pcaml_handle = NULL;
-        pcamr_handle = NULL;        
+        pcamr_handle = NULL;
         ret = SUCCESS;
-        
+
         usbNumber = ce_usb_open();
         if(usbNumber < 1)
         {
@@ -755,7 +783,7 @@ int ce_cam_write_deviceid_D1()
         {
              WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "发现ＵＳＢ设备, number = %d\r\n", usbNumber);
         }
-        
+
         libusb_device_handle *pusb_handle;
         for(int i = 0; i < usbNumber; i++)
         {
@@ -772,18 +800,18 @@ int ce_cam_write_deviceid_D1()
                 if(CAMD1_LEFT == buf)
                 {
                     pcaml_handle = pusb_handle;
-                    
+
                 }
                 else if(CAMD1_RIGHT == buf)
                 {
                     pcamr_handle = pusb_handle;
-                    
+
                 }
             }
         }
-        
+
         if(pcaml_handle==NULL)
-        {            
+        {
             ret= ERROR_LOST_LEFT_CAM;
              WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "未检测到左摄像头\r\n");
         }
@@ -804,9 +832,9 @@ int ce_cam_write_deviceid_D1()
         else
         {
             int temp=0;
-            static int caml_addr = CAMD1_LEFT; 
+            static int caml_addr = CAMD1_LEFT;
             static int camr_addr = CAMD1_RIGHT;
-            
+
 #if 1
             // pre check cam left deviceid
             char readbufL[16] = {0};
@@ -831,8 +859,8 @@ int ce_cam_write_deviceid_D1()
             {
                  WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "read left cam deviceid fail!\r\n");
             }
-            
-            // pre check cam right deviceid            
+
+            // pre check cam right deviceid
             if (SUCCESS == ce_cam_i2c_readrom(camr_addr, (unsigned char *)readbufR))
             {
                 if (SUCCESS == ce_cam_check_deviceid(readbufR, &readbufR_serial))
@@ -848,20 +876,20 @@ int ce_cam_write_deviceid_D1()
             {
                  WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "read right cam deviceid fail!\r\n");
             }
-            
+
             if (readbufL_flag && readbufR_flag)
             {
                 WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "左摄像头已有编号: %s\r\n", readbufL);
                 WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "右摄像头已有编号: %s\r\n", readbufR);
-                
+
                 if (readbufL_serial != readbufR_serial)
                 {
                     WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "左右摄像头编号不一致，需要重新写入... \r\n");
                     readbufL_flag = false;
-                    readbufR_flag = false;                    
+                    readbufR_flag = false;
                 }
             }
-            
+
             if ((readbufL_flag && readbufR_flag && !g_nForceWriteFlag) ||
                 (readbufL_flag && readbufR_flag && (readbufL_serial == g_nCamSerial_D - 1)))
             {
@@ -873,7 +901,7 @@ int ce_cam_write_deviceid_D1()
                 g_nCamSerial_D++;
                 if (g_nCamSerial_D > 99999)
                     g_nCamSerial_D = 1;
-                
+
                 ce_set_cam_serial_to_log(g_nCamSerial_D, g_nCamSerial_S);
             }
             else
@@ -883,139 +911,161 @@ int ce_cam_write_deviceid_D1()
                 char writebufR[16] = {0};
                 bool writebufL_flag = false;
                 bool writebufR_flag = false;
-            
+
                 /* write left cam deviceid */
-                ce_cam_build_deviceid(writebufL, CE_CAM_TYPE_D, CE_CAM_SUB_TYPE_D1_V1P6, CAMD1_LEFT, g_nCamSerial_D);                
+                ce_cam_build_deviceid(writebufL, CE_CAM_TYPE_D, CE_CAM_SUB_TYPE_D1_V1P6, CAMD1_LEFT, g_nCamSerial_D);
                 if(SUCCESS == ce_cam_i2c_writerom(caml_addr, (unsigned char *)writebufL))
                 {
                      WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "重新写入左摄像头编号: %s\r\n", writebufL);
                     writebufL_flag = true;
-                    
+
                 }
-                
+
                 /* write right cam deviceid */
                 ce_cam_build_deviceid(writebufR, CE_CAM_TYPE_D, CE_CAM_SUB_TYPE_D1_V1P6, CAMD1_RIGHT, g_nCamSerial_D);
                 if(SUCCESS == ce_cam_i2c_writerom(camr_addr, (unsigned char *)writebufR))
-                {                    
+                {
                      WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "重新写入右摄像头编号: %s\r\n", writebufR);
                     writebufR_flag = true;
                 }
-                
+
                 if (writebufL_flag && writebufR_flag)
                 {
                     g_nCamSerial_D++;
                     if (g_nCamSerial_D > 99999)
                         g_nCamSerial_D = 1;
-                    
+
                     ce_set_cam_serial_to_log(g_nCamSerial_D, g_nCamSerial_S);
                 }
             }
-             WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "\r\n");            
+             WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "\r\n");
 #endif
         }
-        
+
         sleep(1);
-        ce_usb_close();    
+        ce_usb_close();
     }
-    
+
     return SUCCESS;
 }
 
 int ce_cam_capture_init()
 {
-    int ret_val=0;
-
+    int ret_val = SUCCESS;
     int r;
-    r = ce_usb_open();
-    if(r<1)
-    {
-        LOG("celog: No cameras found! r = %d\r\n",r);
-        return ERROR;
-    }
-    else
-    {
-        LOG("celog: Number of device of interest found: %d\r\n",r);
-    }
 
-    libusb_device_handle *pusb_handle;
-    for(int i=0; i<r; i++)
+    int count = 0;
+    while(g_nCtrl)
     {
-        unsigned char buf = 0;
-        pusb_handle = ce_usb_gethandle(i);
-        int r_num = libusb_control_transfer(pusb_handle,RT_D2H,GET_CAM_LR,0,0,&buf,1,1000);
-        if(r_num != 1)
+        sleep(1);
+        ret_val = SUCCESS;
+        pcaml_handle = NULL;
+        pcamr_handle = NULL;
+        r = ce_usb_open();
+        if(r<1)
         {
-            LOG("celog: Get the device LR addr failed");
+            WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "ce_cam_capture_init No cameras found! r = %d, count = %d\r\n",r, count++);
+            continue;
         }
         else
         {
-            if(CAMD1_LEFT == buf)
+            WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "ce_cam_capture_init Number of device of interest found: %d\r\n",r);
+        }
+
+        libusb_device_handle *pusb_handle;
+        for(int i=0; i<r; i++)
+        {
+            unsigned char buf = 0;
+            pusb_handle = ce_usb_gethandle(i);
+            int r_num = libusb_control_transfer(pusb_handle,RT_D2H,GET_CAM_LR,0,0,&buf,1,1000);
+            if(r_num != 1)
             {
-                pcaml_handle = pusb_handle;
-                
+                LOG("celog: Get the device LR addr failed");
             }
-            else if(CAMD1_RIGHT == buf)
+            else
             {
-                pcamr_handle = pusb_handle;
-                
+                if(CAMD1_LEFT == buf)
+                {
+                    pcaml_handle = pusb_handle;
+                    WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "ce_cam_capture_init pcaml_handle = %p\r\n", pcaml_handle);
+
+                }
+                else if(CAMD1_RIGHT == buf)
+                {
+                    pcamr_handle = pusb_handle;
+                    WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "ce_cam_capture_init pcamr_handle = %p\r\n", pcamr_handle);
+
+                }
             }
         }
-    }
-    
-    if(ce_config_get_cf_cam_mode() & CAMD1_LEFT_ENABLE)
-    {
-        if(pcaml_handle==NULL)
-            ret_val= ERROR;
-    }
 
-    if(ce_config_get_cf_cam_mode() & CAMD1_RIGHT_ENABLE)
-    {
-        if(pcamr_handle==NULL)
-            ret_val= ERROR;
-    }
-
-    if(ERROR == ret_val)
-    {
-        LOG("celog: lost a cam left or right \r\n");
-        return ERROR;
-    }
-    else
-    {
-        int temp=0;
-        static int caml_addr = CAMD1_LEFT; 
-        static int camr_addr = CAMD1_RIGHT;
-
-        ce_cam_get_soft_version(caml_addr);
-        ce_cam_get_soft_version(camr_addr);
-        
-        if(ce_config_get_cf_cam_mode()& CAMD1_LEFT_ENABLE)
+        if(ce_config_get_cf_cam_mode() & CAMD1_LEFT_ENABLE)
         {
-
-            temp = pthread_create(&ce_camd1l_capture_thread, NULL, ce_cam_capture, &caml_addr);
-            if(temp)
-            {
-                LOG("celog: create thread failed !\r\n");
-                return ERROR;
-            }
+            if(pcaml_handle==NULL)
+                ret_val= ERROR;
         }
 
         if(ce_config_get_cf_cam_mode() & CAMD1_RIGHT_ENABLE)
         {
-            temp = pthread_create(&ce_camd1r_capture_thread, NULL, ce_cam_capture, &camr_addr);
-            if(temp)
+            if(pcamr_handle==NULL)
+                ret_val= ERROR;
+        }
+
+        if(ERROR == ret_val)
+        {
+            WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "ce_cam_capture_init lost a cam left or right \r\n");
+            //return ERROR;
+            ce_usb_close();
+            continue;
+        }
+        else
+        {
+            int temp=0;
+            static int caml_addr = CAMD1_LEFT;
+            static int camr_addr = CAMD1_RIGHT;
+
+            ce_cam_get_soft_version(caml_addr);
+            ce_cam_get_soft_version(camr_addr);
+
+            ce_cam_read_error_flag_left = false;
+            ce_cam_read_error_flag_right = false;
+            if(ce_config_get_cf_cam_mode()& CAMD1_LEFT_ENABLE)
             {
-                LOG("celog: create thread failed !\r\n");
-                return ERROR;
+                temp = pthread_create(&ce_camd1l_capture_thread, NULL, ce_cam_capture, &caml_addr);
+                if(temp)
+                {
+                    WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "ce_cam_capture_init create thread failed !\r\n");
+                    ce_cam_read_error_flag_left = true;
+                    //return ERROR;
+                }
+            }
+
+            if(ce_config_get_cf_cam_mode() & CAMD1_RIGHT_ENABLE)
+            {
+                temp = pthread_create(&ce_camd1r_capture_thread, NULL, ce_cam_capture, &camr_addr);
+                if(temp)
+                {
+                    WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "ce_cam_capture_init create thread failed !\r\n");
+                    ce_cam_read_error_flag_right = true;
+                    //return ERROR;
+                }
+            }
+
+            while (g_nCtrl && (!ce_cam_read_error_flag_left || !ce_cam_read_error_flag_right))
+            {
+                usleep(1000);
             }
         }
 
-        usleep(1000);
-        return SUCCESS;
+        ce_usb_close();
     }
+
+    usleep(1000);
+    return SUCCESS;
 }
 
 void ce_cam_capture_close()
-{   
+{
     ce_cam_capture_stop_run=true;
     usleep(100);
     if(ce_camd1l_capture_thread !=0)
@@ -1047,34 +1097,34 @@ static void* ce_cam_showimg(void *)
 
         memcpy(img_left.data, img_lr_pkg->left_img->data, ce_config_get_cf_img_size());
         //cv::imshow("left",img_left);
-        std::cout << "left tamps:" << std::setprecision(15) << img_lr_pkg->left_img->timestamp << std::endl;
+//        std::cout << "left tamps:" << std::setprecision(15) << img_lr_pkg->left_img->timestamp << std::endl;
 
         memcpy(img_right.data,img_lr_pkg->right_img->data,ce_config_get_cf_img_size());
         //cv::imshow("right",img_right);
-        std::cout << "right tamps:" << std::setprecision(15) << img_lr_pkg->right_img->timestamp << std::endl;
-        
-        
-        
-        cv::Mat result(img_left.rows, 
-                   img_left.cols + img_right.cols, 
+//        std::cout << "right tamps:" << std::setprecision(15) << img_lr_pkg->right_img->timestamp << std::endl;
+
+
+
+        cv::Mat result(img_left.rows,
+                   img_left.cols + img_right.cols,
                    img_left.type());
- 
-        
+
+
 
         img_left.colRange( 0, img_left.cols).copyTo(result.colRange(0, img_left.cols));
- 
+
         img_right.colRange( 0, img_right.cols).copyTo(result.colRange(img_left.cols, result.cols));
-    	cv::circle(result, cv::Point(376,240),10, cv::Scalar(0,0,255));   
-    	cv::circle(result, cv::Point(1128,240),10, cv::Scalar(0,0,255));   
-	cv::imshow("result",result);
-        
+        cv::circle(result, cv::Point(376,240),10, cv::Scalar(0,0,255));
+        cv::circle(result, cv::Point(1128,240),10, cv::Scalar(0,0,255));
+    cv::imshow("result",result);
+
         cv::waitKey(1);
 
         delete img_lr_pkg->left_img;
         delete img_lr_pkg->right_img;
         delete img_lr_pkg;
     }
-    
+
     ce_cam_showimg_thread = 0;
     pthread_exit(NULL);
 }
@@ -1092,31 +1142,31 @@ int ce_cam_showimg_init()
 }
 
 void ce_cam_showimg_close()
-{    
+{
     ce_cam_showimg_stop_run = true;
     usleep(100);
-    
+
     if(ce_cam_showimg_thread != 0)
     {
         pthread_join(ce_cam_showimg_thread,NULL);
-    }    
+    }
 }
 
 static void* ce_cam_preprocess(void *)
 {
-    
-    
+
+
     cv::Mat img_left(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
     cv::Mat img_right(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
-    
+
     cv::Mat img_left_remap(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
     cv::Mat img_right_remap(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
 
     cv::Mat M1, D1, M2, D2;
     cv::Mat R, T, R1, P1, R2, P2 ,Q;
 
-    cv::Mat l_remapx,l_remapy,r_remapx,r_remapy;   
-        
+    cv::Mat l_remapx,l_remapy,r_remapx,r_remapy;
+
     cv::FileStorage fs(ce_config_get_cf_cam_intrinsics(), cv::FileStorage::READ);
     if(!fs.isOpened())
     {
@@ -1139,24 +1189,24 @@ static void* ce_cam_preprocess(void *)
 
     fs["R"] >> R;
     fs["T"] >> T;
-    
+
     fs["R1"] >> R1;
     fs["R2"] >> R2;
     fs["P1"] >> P1;
     fs["P2"] >> P2;
     fs["Q"] >> Q;
-    
-    
+
+
     cv::fisheye::initUndistortRectifyMap(M1, D1, R1, P1, img_left.size(), CV_16SC2, l_remapx, l_remapy);
     cv::fisheye::initUndistortRectifyMap(M2, D2, R2, P2, img_right.size(), CV_16SC2, r_remapx, r_remapy);
-    
-    
+
+
     img_pkg timg_pkg;
 
     img_pkg *l_img_pkg = NULL;
     img_pkg *r_img_pkg = NULL;
 
-    
+
     while(!ce_cam_preprocess_stop_run)
     {
         if((!img_pkg_left_list.empty()) && (!img_pkg_right_list.empty()))
@@ -1165,8 +1215,8 @@ static void* ce_cam_preprocess(void *)
             img_pkg_right_list.try_front(r_img_pkg);
 
             double diff_tamps = fabs(l_img_pkg->timestamp - r_img_pkg->timestamp);
-            
-            if( diff_tamps > 0.005 ) 
+
+            if( diff_tamps > 0.005 )
             {
                 std::cout << "celog: something error the image is no sync!\r\n" << std::endl;
                 if(l_img_pkg->timestamp < r_img_pkg->timestamp )  // give up the early data
@@ -1207,14 +1257,14 @@ static void* ce_cam_preprocess(void *)
                 {
                     memcpy(img_left.data, t_output_pkg->left_img->data, ce_config_get_cf_img_size());
                     memcpy(img_right.data,t_output_pkg->right_img->data,ce_config_get_cf_img_size());
-        
+
                     remap(img_left, img_left_remap, l_remapx, l_remapy, cv::INTER_LINEAR);
                     remap(img_right, img_right_remap, r_remapx, r_remapy, cv::INTER_LINEAR);
-                    
+
                     memcpy(t_output_pkg->left_img->data, img_left_remap.data, ce_config_get_cf_img_size());
                     memcpy(t_output_pkg->right_img->data, img_right_remap.data, ce_config_get_cf_img_size());
                 }
-                
+
                 d1_img_output_pkg *t_pkg_giveup = NULL;
 
                 img_pkg_list_d1.push(t_output_pkg, t_pkg_giveup, 30);

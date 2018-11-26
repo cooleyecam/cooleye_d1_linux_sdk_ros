@@ -23,7 +23,7 @@
 #include "threadsafe_queue.h"
 #include "cedriver_config.h"
 #include "celib_MadgwickAHRS.h"
-
+#include "logmsg.h"
 
 threadsafe_queue<icm20689_pkg *> icm20689_pkg_list;
 
@@ -139,7 +139,7 @@ static int ce_imu_set_uart(int fd,int nSpeed, int nBits, char nEvent, int nStop)
     case 460800:
         cfsetispeed(&newtio, B460800);
         cfsetospeed(&newtio, B460800);
-        break;    
+        break;
     default:
         cfsetispeed(&newtio, B9600);
         cfsetospeed(&newtio, B9600);
@@ -165,67 +165,67 @@ static int ce_imu_format_imu_frame(unsigned char* imu_frame, double timestamp, i
 
     float RotMat[3][3];
     ce_config_get_cf_imu_icm20689_acc_T((float **)RotMat);
-    
+
     float acc_biasX = ce_config_get_cf_imu_icm20689_acc_bias_X();
     float acc_biasY = ce_config_get_cf_imu_icm20689_acc_bias_Y();
     float acc_biasZ = ce_config_get_cf_imu_icm20689_acc_bias_Z();
-    
+
     float acc_offset[3] = {acc_biasX,  acc_biasY, acc_biasZ};
 
     float gyro_biasX = ce_config_get_cf_imu_icm20689_gyro_bias_X();
     float gyro_biasY = ce_config_get_cf_imu_icm20689_gyro_bias_Y();
     float gyro_biasZ = ce_config_get_cf_imu_icm20689_gyro_bias_Z();
-    
+
     float gyro_offset[3] = {gyro_biasX,  gyro_biasY, gyro_biasZ};
-    
-    
-    
-    
+
+
+
+
     int imu_data[6];
 
     imu_data[0] = *(short*)(&imu_frame[3]);
     imu_data[1] = *(short*)(&imu_frame[5]);
     imu_data[2] = *(short*)(&imu_frame[7]);
-    
+
     imu_data[3] = *(short*)(&imu_frame[9]);
     imu_data[4] = *(short*)(&imu_frame[11]);
     imu_data[5] = *(short*)(&imu_frame[13]);
-    
-    
+
+
     ticm20689_pkg->num = imu_frame[2];
 
     float fgyro_nobias[3]= {
         ((float)imu_data[0]-gyro_offset[0]),
         ((float)imu_data[1]-gyro_offset[1]),
         ((float)imu_data[2]-gyro_offset[2])};
-    
+
     ticm20689_pkg->rx = 1.0*fgyro_nobias[0]/32768*500;
     ticm20689_pkg->ry = 1.0*fgyro_nobias[1]/32768*500;
     ticm20689_pkg->rz = 1.0*fgyro_nobias[2]/32768*500;
-    
-    
-    
+
+
+
     float facc_nobias[3]= {
         ((float)imu_data[3]-acc_offset[0]),
         ((float)imu_data[4]-acc_offset[1]),
         ((float)imu_data[5]-acc_offset[2])};
-    
-    
-        
+
+
+
     float facc_t[3] ={0,0,0};
 
     facc_t[0] = 1.0*facc_nobias[0]/8192*STD_g;
     facc_t[1] = 1.0*facc_nobias[1]/8192*STD_g;
-    facc_t[2] = 1.0*facc_nobias[2]/8192*STD_g;    
-    
+    facc_t[2] = 1.0*facc_nobias[2]/8192*STD_g;
+
 //     ticm20689_pkg->ax = 1.0*facc_nobias[0]/8192*STD_g;
 //     ticm20689_pkg->ay = 1.0*facc_nobias[1]/8192*STD_g;
 //     ticm20689_pkg->az = 1.0*facc_nobias[2]/8192*STD_g;
-    
+
     ticm20689_pkg->ax = RotMat[0][0]*facc_t[0] + RotMat[0][1]*facc_t[1] + RotMat[0][2]*facc_t[2];
     ticm20689_pkg->ay = RotMat[1][0]*facc_t[0] + RotMat[1][1]*facc_t[1] + RotMat[1][2]*facc_t[2];
     ticm20689_pkg->az = RotMat[2][0]*facc_t[0] + RotMat[2][1]*facc_t[1] + RotMat[2][2]*facc_t[2];
-    
+
 
     ticm20689_pkg->timestamp = timestamp - IMU_DELAY_OFFSET;
 
@@ -235,7 +235,7 @@ static int ce_imu_format_imu_frame(unsigned char* imu_frame, double timestamp, i
 
 static int ce_imu_cmd_icm20689_start()
 {
-    
+
     unsigned char tcmd[10];
 
     tcmd[0] = CMD_HEAD1;
@@ -243,11 +243,11 @@ static int ce_imu_cmd_icm20689_start()
     tcmd[2] = CMD_IMC20689_START;
 
     short int acc_offset[3] ;
-                                
+
     acc_offset[0] = (short int)ce_config_get_cf_imu_icm20689_acc_bias_X();
     acc_offset[1] = (short int)ce_config_get_cf_imu_icm20689_acc_bias_Y();
-    acc_offset[2] = (short int)ce_config_get_cf_imu_icm20689_acc_bias_Z();                                
-                                
+    acc_offset[2] = (short int)ce_config_get_cf_imu_icm20689_acc_bias_Z();
+
     memcpy(&tcmd[3], acc_offset, 6);
 
     tcmd[9] = 0;
@@ -272,13 +272,13 @@ static int ce_imu_cmd_sample_rate()
     tcmd[2] = CMD_IMC20689_SAMPLE_RATE;
 
     tcmd[3] = 1000/ce_config_get_cf_imu_icm20689_sample_rate() - 1 ;
-    
+
     tcmd[9] = 0;
     for(int i=3; i<9; i++)
     {
         tcmd[9] += tcmd[i];
     }
-    
+
     int ret = write(ce_imu_uart_fd, tcmd, 10);
     usleep(10000);
     return ret;
@@ -315,12 +315,12 @@ void *ce_imu_data_feed(void*)
 
     last_time =  start_time - (double)1/ce_config_get_cf_imu_icm20689_sample_rate();
     last_pred =  start_time - (double)1/ce_config_get_cf_imu_icm20689_sample_rate();
-    
+
     int num_get = 0;
-    
+
     tcflush(ce_imu_uart_fd, TCIFLUSH);
     while(!ce_imu_capture_stop_run)
-    {        
+    {
         start_time = getIMUTime.tv_sec + 0.000001 * getIMUTime.tv_usec;
 
         while(num_get < IMU_FRAME_LEN)
@@ -332,10 +332,10 @@ void *ce_imu_data_feed(void*)
             }
             num_get += temp_read_get;
         }
-        
+
         if (0 == num_get)
             continue;
-        
+
         //std::cout << "start_time :"<< std::setprecision(15)  << start_time <<std::endl;
         gettimeofday(&getIMUTime, NULL);
 
@@ -355,7 +355,7 @@ void *ce_imu_data_feed(void*)
         }
 
         int valid_len = num_get - position_pkghead;
-        
+
         if(valid_len<IMU_FRAME_LEN)
         {
             for(int i=0; i<valid_len; i++)
@@ -367,7 +367,7 @@ void *ce_imu_data_feed(void*)
             num_get = valid_len;
             continue;
         }
-        
+
         unsigned char checksum = 0;
         for(int i=2; i<(IMU_FRAME_LEN-1); i++)checksum += imu_frame_buf[position_pkghead+i];
         if(checksum != imu_frame_buf[position_pkghead+(IMU_FRAME_LEN-1)])
@@ -381,7 +381,7 @@ void *ce_imu_data_feed(void*)
             num_get = valid_len-2;
             continue;
         }
-        
+
         if(valid_len > IMU_FRAME_LEN)
         {
             tcflush(ce_imu_uart_fd, TCIFLUSH);
@@ -425,8 +425,8 @@ void *ce_imu_data_feed(void*)
         {
             delete icm20689_giveup;
             icm20689_giveup = NULL;
-        }    
-        
+        }
+
         memset(imu_frame_buf, 0, 2*IMU_FRAME_LEN);
         num_get = 0;
 
@@ -458,9 +458,9 @@ int ce_imu_capture_init()
         printf("celog: icm20689_start failed !\r\n");
         return ERROR;
     }
-    
-    
-    
+
+
+
     if(ERROR == ce_imu_cmd_sample_rate())
     {
         printf("celog: icm20689 set sample rate failed !\r\n");
@@ -483,7 +483,7 @@ void ce_imu_capture_close()
 {
     ce_imu_capture_stop_run = true;
     usleep(10000);
-    
+
     if(ce_imu_capture_thread !=0)
     {
         pthread_join(ce_imu_capture_thread, NULL);
@@ -506,7 +506,7 @@ static void* ce_imu_showdata(void *)
 //         std::cout << "Acc X :" << ticm20689_pkg->ax << std::endl;
 //         std::cout << "Acc Y :" << ticm20689_pkg->ay << std::endl;
 //         std::cout << "Acc Z :" << ticm20689_pkg->az << std::endl;
-// 
+//
 //         std::cout << "Gyr X :" << ticm20689_pkg->rx << std::endl;
 //         std::cout << "Gyr Y :" << ticm20689_pkg->ry << std::endl;
 //         std::cout << "Gyr Z :" << ticm20689_pkg->rz << std::endl;
@@ -539,20 +539,20 @@ int ce_imu_showdata_init()
 }
 
 void ce_imu_showdata_close()
-{    
+{
     ce_imu_showdata_stop_run = true;
     usleep(100);
-    
+
     if(ce_imu_showdata_thread != 0)
     {
         pthread_join(ce_imu_showdata_thread,NULL);
-    }    
+    }
 }
 
 
 void ce_imu_clear_list()
 {
-    
+
     icm20689_pkg *ticm20689_pkg;
     int tsize = 0;
 
@@ -562,13 +562,13 @@ void ce_imu_clear_list()
         {
             continue;
         }
-        
+
         delete ticm20689_pkg;
         ticm20689_pkg = NULL;
         tsize = icm20689_pkg_list.size();
-        
+
     }
-    
+
 }
 
 
@@ -578,23 +578,23 @@ void ce_imu_get_acc_data(short int *ptr)
     short int *ptr_raw;
     ptr_raw = ptr;
     icm20689_pkg *ticm20689_pkg;
- 
+
     ce_imu_clear_list();
- 
+
     while(cnt<=1024)
     {
-        
+
         if(!icm20689_pkg_list.try_pop(ticm20689_pkg))
         {
             usleep(10);
             continue;
         }
 
-        
+
         float norm_gyro = sqrt( ticm20689_pkg->rx * ticm20689_pkg->rx +
                                 ticm20689_pkg->ry * ticm20689_pkg->ry +
                                 ticm20689_pkg->rz * ticm20689_pkg->rz);
-        
+
         if(norm_gyro > 10)
         {
             std::cout << "celog: don't move the camera..." << std::endl;
@@ -603,25 +603,25 @@ void ce_imu_get_acc_data(short int *ptr)
             sleep(1);
             continue;
         }
-        
-        
-        
+
+
+
         *ptr = (short int)(ticm20689_pkg->ax/STD_g*8192);
         ptr++;
         *ptr = (short int)(ticm20689_pkg->ay/STD_g*8192);
         ptr++;
         *ptr = (short int)(ticm20689_pkg->az/STD_g*8192);
         ptr++;
-        
+
         delete ticm20689_pkg;
         ticm20689_pkg = NULL;
         cnt++;
-        
+
         if(cnt%128 == 0)
         {
             std::cout << "cnt :" << cnt <<"/1024" << std::endl;
         }
-        
+
     }
 }
 
@@ -632,26 +632,26 @@ void ce_imu_get_gyro_data(short int *ptr)
     int cnt = 0;
     short int *ptr_raw;
     ptr_raw = ptr;
-    
+
     icm20689_pkg *ticm20689_pkg;
-    
- 
+
+
     ce_imu_clear_list();
- 
+
     while(cnt<=1024*5)
     {
-        
+
         if(!icm20689_pkg_list.try_pop(ticm20689_pkg))
         {
             usleep(10);
             continue;
         }
 
-        
+
         float norm_gyro = sqrt( ticm20689_pkg->rx * ticm20689_pkg->rx +
                                 ticm20689_pkg->ry * ticm20689_pkg->ry +
                                 ticm20689_pkg->rz * ticm20689_pkg->rz);
-        
+
         if(norm_gyro > 10)
         {
             std::cout << "celog: don't move the camera..." << std::endl;
@@ -660,23 +660,23 @@ void ce_imu_get_gyro_data(short int *ptr)
             sleep(1);
             continue;
         }
-        
+
         *ptr = (short int)(ticm20689_pkg->rx/500*32768);
         ptr++;
         *ptr = (short int)(ticm20689_pkg->ry/500*32768);
         ptr++;
         *ptr = (short int)(ticm20689_pkg->rz/500*32768);
         ptr++;
-        
+
         delete ticm20689_pkg;
         ticm20689_pkg = NULL;
         cnt++;
-        
+
         if(cnt%512 == 0)
         {
             std::cout << "cnt :" << cnt <<"/5120" << std::endl;
         }
-        
-        
+
+
     }
 }

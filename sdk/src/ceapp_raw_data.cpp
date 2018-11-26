@@ -16,6 +16,7 @@
 #include "cedriver_cam.h"
 #include "cedriver_imu.h"
 #include "cedriver_config.h"
+#include "logmsg.h"
 
 int g_nCtrl;
 
@@ -27,57 +28,62 @@ void SIGINTHandler(int nSig)
         g_nCtrl = 1;
 }
 
-
-
-
-
 int main(int argc, char* argv[])
 {
+    int r;
     signal(SIGINT, SIGINTHandler);
+    INIT_LOG(1000, 1000, LOGMSG_LEVEL_DEBUG);
 
     ce_config_load_settings("../config/cecfg_std.txt");
 
+#if 0
     int fd = ce_imu_capture_init();
     if(fd < 0)
     {
-        printf("celog: imu caputre error\r\n");
+        WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "ce_imu_capture_init error\r\n");
     }
 
     else
     {
-        printf("celog: imu caputre success\r\n");
+        WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "ce_imu_capture_init success\r\n");
 
         fd = ce_imu_showdata_init();
         if(fd < 0)
-            printf("celog: imu show data error\r\n");
+            WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "ce_imu_showdata_init error\r\n");
         else
-            printf("celog: imu show data success\r\n");
+            WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "ce_imu_showdata_init success\r\n");
     }
+#endif
 
-    int r = ce_cam_capture_init();
+    r = ce_cam_preprocess_init();
     if(r < 0)
     {
-        printf("celog: cam capture error \r\n");
+        WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "ce_cam_preprocess_init error \r\n");
     }
     else
     {
-        printf("celog: cam capture success \r\n");
+        WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "ce_cam_preprocess_init  sucess \r\n");
 
-        r = ce_cam_preprocess_init();
+        r = ce_cam_showimg_init();
         if(r < 0)
         {
-            printf("celog: cam preprocess error \r\n");
+            WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "ce_cam_showimg_init  error \r\n");
         }
         else
         {
-            printf("celog: cam preprocess sucess \r\n");
-
-            r = ce_cam_showimg_init();
-            if(r < 0)
-                printf("celog: cam show image error \r\n");
-            else
-                printf("celog: cam show image sucess \r\n");
+            WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "ce_cam_showimg_init  sucess \r\n");
         }
+    }
+
+    g_nCtrl = 1;
+    r = ce_cam_capture_init();
+    if(r < 0)
+    {
+        WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "ce_cam_capture_init error \r\n");
+    }
+    else
+    {
+        WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "ce_cam_capture_init success \r\n");
     }
 
     g_nCtrl = 1;
@@ -85,10 +91,12 @@ int main(int argc, char* argv[])
     {
         sleep(1);
     }
-    
-    ce_imu_capture_close();     
+
+    ce_imu_capture_close();
     ce_imu_showdata_close();
     ce_cam_capture_close();
     ce_cam_showimg_close();
+
+    FINI_LOG();
     return 0;
 }

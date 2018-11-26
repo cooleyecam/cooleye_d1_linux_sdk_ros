@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
             }
         }
         
-    }        
+    }
     
     openStdoutFile();
     //ce_config_load_settings("../config/cecfg_std.txt");
