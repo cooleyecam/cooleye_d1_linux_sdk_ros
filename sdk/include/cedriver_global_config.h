@@ -102,6 +102,9 @@
 #define CAM_I2C_R           0xA7
 #define CAM_I2C_W           0xA8
 #define CAM_DEVICEID        0xA9
+
+#define CAM_RESET           0xAC
+
 #define auto_expo           1
 #define EXP_VAL             50
 #define GAI_VAL             100
@@ -185,7 +188,7 @@ typedef struct
     global_img_config   gc_img;
     global_ros_config   gc_ros;
     global_ste_config   gc_ste;
-    
+
 }global_config_d1;
 
 

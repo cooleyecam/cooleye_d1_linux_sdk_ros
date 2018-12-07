@@ -392,7 +392,14 @@ static void ce_cam_set_mt9v034_EG_mode(int camlr)
 static void *ce_cam_capture(void *pUserPara)
 {
     int camlr = *(int *)pUserPara;
+
+    WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "Reset cam... \r\n");
+    ce_cam_ctrl_camera(camlr, CAM_RESET);
+
     usleep(1000);
+
+    WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "Config cam... \r\n");
+
     ce_cam_set_mt9v034_config_default(camlr);
 
     ce_cam_set_mt9v034_fps(camlr);
@@ -1083,6 +1090,7 @@ static void* ce_cam_showimg(void *)
     cv::Mat img_right(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
 
     d1_img_output_pkg *img_lr_pkg;
+    cv::Mat img_temp;
 
     while(!ce_cam_showimg_stop_run)
     {
@@ -1092,29 +1100,25 @@ static void* ce_cam_showimg(void *)
                 continue;
         }
 
-
         memcpy(img_left.data, img_lr_pkg->left_img->data, ce_config_get_cf_img_size());
         //cv::imshow("left",img_left);
-//        std::cout << "left tamps:" << std::setprecision(15) << img_lr_pkg->left_img->timestamp << std::endl;
+        //std::cout << "left tamps:" << std::setprecision(15) << img_lr_pkg->left_img->timestamp << std::endl;
 
         memcpy(img_right.data,img_lr_pkg->right_img->data,ce_config_get_cf_img_size());
         //cv::imshow("right",img_right);
-//        std::cout << "right tamps:" << std::setprecision(15) << img_lr_pkg->right_img->timestamp << std::endl;
-
-
+        //std::cout << "right tamps:" << std::setprecision(15) << img_lr_pkg->right_img->timestamp << std::endl;
 
         cv::Mat result(img_left.rows,
                    img_left.cols + img_right.cols,
                    img_left.type());
 
-
-
         img_left.colRange( 0, img_left.cols).copyTo(result.colRange(0, img_left.cols));
 
         img_right.colRange( 0, img_right.cols).copyTo(result.colRange(img_left.cols, result.cols));
-        cv::circle(result, cv::Point(376,240),10, cv::Scalar(0,0,255));
-        cv::circle(result, cv::Point(1128,240),10, cv::Scalar(0,0,255));
-    cv::imshow("result",result);
+        cv::cvtColor(result, img_temp, cv::COLOR_GRAY2BGR);
+        cv::circle(img_temp, cv::Point(376,240),10, cv::Scalar(0,0,255));
+        cv::circle(img_temp, cv::Point(1128,240),10, cv::Scalar(0,0,255));
+        cv::imshow("left",img_temp);
 
         cv::waitKey(1);
 
