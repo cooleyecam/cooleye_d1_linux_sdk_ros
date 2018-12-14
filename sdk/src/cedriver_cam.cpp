@@ -378,7 +378,10 @@ static void *ce_cam_capture(void *pUserPara)
     int camlr = *(int *)pUserPara;
     
     ce_cam_set_mt9v034_config_default(camlr);
- 
+
+    ce_cam_i2c_write(camlr,0x04,ce_config_get_cf_img_width());// 752x480 or 640x480
+    ce_cam_i2c_write(camlr,0x03,ce_config_get_cf_img_height());
+
     ce_cam_set_mt9v034_fps(camlr);
     
     ce_cam_set_mt9v034_EG_mode(camlr);
