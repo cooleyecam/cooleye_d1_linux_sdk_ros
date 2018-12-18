@@ -18,6 +18,7 @@ struct ce_usb_dev_stru
 
 int ce_usb_open(void);
 void ce_usb_close(void);
+void ce_usb_close(int i);
 
 libusb_device_handle *ce_usb_gethandle(int index);
 

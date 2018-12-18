@@ -1,8 +1,7 @@
-#include "string.h"
+#include <string.h>
 #include <stdio.h>
 #include <libusb-1.0/libusb.h>
 #include "cedriver_usb.h"
-#include "logmsg.h"
 
 static int ce_usb_camd1_num;
 static struct  ce_usb_dev_stru ce_usb_dev[MAXDEVICES];
@@ -29,20 +28,19 @@ int ce_usb_open(void)
     r = libusb_init(NULL);
     if (r)
     {
-        printf("libusb_init Error !\n");
+        printf("celog:  init libusb Error !\n");
         return -1;
     }
 
     int cnt_dev = libusb_get_device_list(NULL, &libusb_device_list);
     if ( cnt_dev < 0 )
     {
-        printf("libusb_get_device_list Error !\n");
+        printf("celog: Error in enumerating devices !\n");
         return -2;
     }
 
     ce_usb_camd1_num = 0;
 
-    printf("libusb_get_device_list: return cnt_dev=%d\n",cnt_dev);
     for (int i = 0; i < cnt_dev; ++i )
     {
         libusb_device *tdev = libusb_device_list[i];
@@ -52,7 +50,7 @@ int ce_usb_open(void)
             r = libusb_open(tdev, &ce_usb_dev[ce_usb_camd1_num].handle);
             if ( r )
             {
-                printf("open usb camD1 fail , r=%d\n",r);
+                printf("celog: open usb camD1 fail , r=%d\n",r);
                 return -3;
             }
             printf("+++++++ce_usb_open i=%d, point=%p!\n", ce_usb_camd1_num, ce_usb_dev[ce_usb_camd1_num].handle);
@@ -68,12 +66,31 @@ void ce_usb_close(void)
 {
     for (int i = 0; i < ce_usb_camd1_num; ++i )
     {
-        libusb_close(ce_usb_dev[i].handle);
+        if (ce_usb_dev[i].handle)
+        {
+            libusb_close(ce_usb_dev[i].handle);
+            ce_usb_dev[i].handle = NULL;
+        }
 
-        printf("--------ce_usb_close i=%d, point=%p!\n", i, ce_usb_dev[i].handle);
+        printf("ce_usb_close ,idx=%d, point=%p!\n", i, ce_usb_dev[i].handle);
         memset(&ce_usb_dev[i], 0, sizeof(ce_usb_dev[i]));
     }
-
     libusb_free_device_list(libusb_device_list, 1);
     libusb_exit(NULL);
 }
+
+void ce_usb_close(int i)
+{
+    if (i >= ce_usb_camd1_num)
+        return;
+
+    if (ce_usb_dev[i].handle)
+    {
+        libusb_close(ce_usb_dev[i].handle);
+        ce_usb_dev[i].handle = NULL;
+    }
+
+    printf("ce_usb_close ,idx=%d, point=%p!\n", i, ce_usb_dev[i].handle);
+    memset(&ce_usb_dev[i], 0, sizeof(ce_usb_dev[i]));
+}
+

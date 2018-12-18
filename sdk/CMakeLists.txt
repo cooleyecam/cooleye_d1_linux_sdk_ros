@@ -17,7 +17,7 @@ include_directories("${PROJECT_SOURCE_DIR}/include")
 
 add_library(CEDRIVER_CONFIG src/cedriver_config.cpp)
 
-add_library(CEDRIVER_CAM src/cedriver_usb.cpp src/cedriver_cam.cpp src/logmsg.cpp)
+add_library(CEDRIVER_CAM src/cedriver_usb.cpp src/cedriver_cam.cpp src/logmsg.cpp src/cpu_set.cpp)
 
 add_library(CELIB_MadgwickAHRS src/celib_MadgwickAHRS.cpp)
 

@@ -17,8 +17,10 @@
 #include "cedriver_imu.h"
 #include "cedriver_config.h"
 #include "logmsg.h"
+#include "cpu_set.h"
 
 int g_nCtrl = 1;
+extern int g_nPara;
 
 void SIGINTHandler(int nSig)
 {
@@ -36,9 +38,23 @@ void SIGINTHandler(int nSig)
 
 int main(int argc, char* argv[])
 {
-    int r;
+    int r = 0;
     signal(SIGINT, SIGINTHandler);
     INIT_LOG(1000, 1000, LOGMSG_LEVEL_DEBUG);
+
+    if (argc == 2)
+    {
+        g_nPara = atoi(argv[1]);
+    }
+
+    CCpuSet::instance()->m_nCpuPoolSize = 6;
+    CCpuSet::instance()->m_aCpuPool[0] = 0;
+    CCpuSet::instance()->m_aCpuPool[1] = 1;
+    CCpuSet::instance()->m_aCpuPool[2] = 2;
+    CCpuSet::instance()->m_aCpuPool[3] = 3;
+    CCpuSet::instance()->m_aCpuPool[4] = 1;
+    CCpuSet::instance()->m_aCpuPool[5] = 2;
+    CCpuSet::instance()->m_nCpuSetFlag = true;
 
     ce_config_load_settings("../config/cecfg_std.txt");
 
@@ -102,8 +118,8 @@ int main(int argc, char* argv[])
     ce_imu_showdata_close();
 #endif
 
-    //ce_cam_capture_close();
     ce_cam_showimg_close();
+    usleep(10000);
 
     FINI_LOG();
     return 0;

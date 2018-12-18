@@ -49,13 +49,18 @@ typedef struct ce_camd1_dev_s
     }
 }ce_camd1_dev_t;
 
-
+/* D1 */
 int ce_cam_capture_init();
 void ce_cam_capture_close();
 int ce_cam_showimg_init();
 void ce_cam_showimg_close();
 int ce_cam_preprocess_init();
 void ce_cam_preprocess_close();
+
+/* S1 */
+int ce_cams1_capture_init();
+int ce_cams1_preprocess_init();
+void ce_cams1_preprocess_close();
 
 int ce_cam_write_deviceid_D1();
 int ce_cam_write_deviceid_S1();
