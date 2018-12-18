@@ -22,7 +22,6 @@
 
 #define MAXDEVICES      5
 
-
 #define RT_H2D      0x40
 #define RT_D2H      0xC0
 
@@ -45,19 +44,24 @@
 //////////////////////////////////////////////////////////////////////////
 #define CAMD1_SYS_CLKIN 27000000
 
-#define CAMD1_LEFT      0xF1
 #define CAMD1_RIGHT     0xF0
+#define CAMD1_LEFT      0xF1
+#define CAMD1_FIRST     CAMD1_RIGHT
+#define CAMD1_LAST      CAMD1_LEFT
+#define CAMD1_CNT_MAX   2
 
-#define CAMS1_00      0xB0
-#define CAMS1_01      0xB1
-#define CAMS1_02      0xB2
-#define CAMS1_03      0xB3
-#define CAMS1_04      0xB4
-#define CAMS1_05      0xB5
-#define CAMS1_06      0xB6
-#define CAMS1_07      0xB7
-#define CAMS1_MIN     CAMS1_00
-#define CAMS1_MAX     CAMS1_07
+#define CAMS1_N0      0xB0
+#define CAMS1_N1      0xB1
+#define CAMS1_N2      0xB2
+#define CAMS1_N3      0xB3
+#define CAMS1_N4      0xB4
+#define CAMS1_N5      0xB5
+#define CAMS1_N6      0xB6
+#define CAMS1_N7      0xB7
+#define CAMS1_FIRST     CAMS1_N0
+#define CAMS1_LAST      CAMS1_N7
+#define CAMS1_CNT_MAX   8
+
 
 #define CE_GET_CAM_L_R_STRING(n) n==CAMD1_LEFT ? "left" : n==CAMD1_RIGHT ? "right" : "unknown"
 

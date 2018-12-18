@@ -15,6 +15,41 @@ struct d1_img_output_pkg
     img_pkg *right_img;
 };
 
+typedef struct ce_cams1_dev_s
+{
+    libusb_device_handle *handle;
+    pthread_t thread;
+    threadsafe_queue<img_pkg *> list;
+    bool read_error_flag;
+    int cam;
+
+    ce_cams1_dev_s()
+    {
+        handle = NULL;
+        thread = 0;
+        read_error_flag = false;
+        cam = 0;
+    }
+}ce_cams1_dev_t;
+
+typedef struct ce_camd1_dev_s
+{
+    libusb_device_handle *handle;
+    pthread_t thread;
+    threadsafe_queue<img_pkg *> list;
+    bool read_error_flag;
+    int cam;
+
+    ce_camd1_dev_s()
+    {
+        handle = NULL;
+        thread = 0;
+        read_error_flag = false;
+        cam = 0;
+    }
+}ce_camd1_dev_t;
+
+
 int ce_cam_capture_init();
 void ce_cam_capture_close();
 int ce_cam_showimg_init();
