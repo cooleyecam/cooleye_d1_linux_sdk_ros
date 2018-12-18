@@ -20,7 +20,7 @@
 #define PID_CE_D1   0x1003
 #define VID_CE_D1   0x04B4
 
-#define MAXDEVICES      2
+#define MAXDEVICES      5
 
 
 #define RT_H2D      0x40

@@ -42,6 +42,7 @@ int ce_usb_open(void)
 
     ce_usb_camd1_num = 0;
 
+    printf("libusb_get_device_list: return cnt_dev=%d\n",cnt_dev);
     for (int i = 0; i < cnt_dev; ++i )
     {
         libusb_device *tdev = libusb_device_list[i];
@@ -57,7 +58,7 @@ int ce_usb_open(void)
             printf("+++++++ce_usb_open i=%d, point=%p!\n", ce_usb_camd1_num, ce_usb_dev[ce_usb_camd1_num].handle);
             ++ce_usb_camd1_num;
         }
-        if(ce_usb_camd1_num>MAXDEVICES)
+        if(ce_usb_camd1_num>=MAXDEVICES)
             break;
     }
     return ce_usb_camd1_num;

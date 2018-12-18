@@ -1001,6 +1001,11 @@ int ce_cam_capture_init()
                     WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "ce_cam_capture_init pcamr_handle = %p\r\n", pcamr_handle);
 
                 }
+                else
+                {
+                    libusb_close(pusb_handle);
+                    WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "close unknown usb = 0x%x\r\n", buf);
+                }
             }
         }
 
