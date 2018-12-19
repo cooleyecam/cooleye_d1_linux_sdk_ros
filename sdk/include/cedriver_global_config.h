@@ -10,7 +10,8 @@
 
 #define SUCCESS     0
 #define ERROR       -1
-
+#define ERROR_LOST_LEFT_CAM       -2
+#define ERROR_LOST_RIGHT_CAM       -3
 
 //////////////////////////////////////////////////////////////////////////
 //////   CAM D1  USB setting
@@ -19,8 +20,7 @@
 #define PID_CE_D1   0x1003
 #define VID_CE_D1   0x04B4
 
-#define MAXDEVICES      2
-
+#define MAXDEVICES      5
 
 #define RT_H2D      0x40
 #define RT_D2H      0xC0
@@ -43,11 +43,34 @@
 //////   CAM D1  CAM setting
 //////////////////////////////////////////////////////////////////////////
 #define CAMD1_SYS_CLKIN 27000000
+//#define CAMD1_SYS_CLKIN 26666666
 
-#define CAMD1_LEFT      0xF1
+
 #define CAMD1_RIGHT     0xF0
+#define CAMD1_LEFT      0xF1
+#define CAMD1_FIRST     CAMD1_RIGHT
+#define CAMD1_LAST      CAMD1_LEFT
+#define CAMD1_CNT_MAX   2
+
+#define CAMD1_RIGHT_IDX (CAMD1_RIGHT-CAMD1_FIRST)
+#define CAMD1_LEFT_IDX  (CAMD1_LEFT-CAMD1_FIRST)
 
 
+
+#define CAMS1_N0      0xB0
+#define CAMS1_N1      0xB1
+#define CAMS1_N2      0xB2
+#define CAMS1_N3      0xB3
+#define CAMS1_N4      0xB4
+#define CAMS1_N5      0xB5
+#define CAMS1_N6      0xB6
+#define CAMS1_N7      0xB7
+#define CAMS1_FIRST     CAMS1_N0
+#define CAMS1_LAST      CAMS1_N7
+#define CAMS1_CNT_MAX   8
+
+
+#define CE_GET_CAM_L_R_STRING(n) n==CAMD1_LEFT ? "left" : n==CAMD1_RIGHT ? "right" : "unknown"
 
 #define CAMD1_RESOLUTION_VGA 1
 #define CAMD1_RESOLUTION_WVGA 2
@@ -55,7 +78,17 @@
 #define CAMD1_LEFT_ENABLE   0x01
 #define CAMD1_RIGHT_ENABLE   0x02
 
+/*DEVICE ID MACRO*/
+#define CE_DEVICEID_LEN  16
+#define CE_DEVICEID_MEMORY_ADDR  0xFF00
 
+#define CE_CAM_TYPE_D '1'
+#define CE_CAM_TYPE_S '3'
+
+#define CE_CAM_SUB_TYPE_D1_V1P6 "001"
+#define CE_CAM_SUB_TYPE_S1_V2P0 "001"
+
+#define CE_CAM_SERIAL_LEN 5
 
 /*PARAMETER MACRO*/
 #define IMG_WIDTH_VGA   640
@@ -79,11 +112,17 @@
 
 #define CAM_I2C_R           0xA7
 #define CAM_I2C_W           0xA8
+#define CAM_DEVICEID        0xA9
+
+#define CAM_RESET           0xAC
+
 #define auto_expo           1
 #define EXP_VAL             50
 #define GAI_VAL             100
 
 #define CAM_I2C_ADDR        0x5C //0x5C
+
+#define VSCEL_I2C_ADDR      0X40
 
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -162,7 +201,7 @@ typedef struct
     global_img_config   gc_img;
     global_ros_config   gc_ros;
     global_ste_config   gc_ste;
-    
+
 }global_config_d1;
 
 
