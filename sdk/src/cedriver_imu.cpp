@@ -24,6 +24,7 @@
 #include "cedriver_config.h"
 #include "celib_MadgwickAHRS.h"
 #include "logmsg.h"
+#include "cpu_set.h"
 
 threadsafe_queue<icm20689_pkg *> icm20689_pkg_list;
 
@@ -493,6 +494,9 @@ void ce_imu_capture_close()
 static void* ce_imu_showdata(void *)
 {
     icm20689_pkg *ticm20689_pkg;
+
+    CCpuSet::instance()->SetCpu(0, "imu_show");
+
     while(!ce_imu_showdata_stop_run)
     {
         if(!icm20689_pkg_list.try_pop(ticm20689_pkg))
@@ -500,7 +504,6 @@ static void* ce_imu_showdata(void *)
             usleep(100);
             continue;
         }
-
 
          std::cout << "imu_stamp :" << std::setprecision(15)<< ticm20689_pkg->timestamp << std::endl;
 //         std::cout << "Acc X :" << ticm20689_pkg->ax << std::endl;

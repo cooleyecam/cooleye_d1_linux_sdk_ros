@@ -23,7 +23,7 @@ add_library(CELIB_MadgwickAHRS src/celib_MadgwickAHRS.cpp)
 
 add_library(CELIB_IMG_PROCESS src/celib_img_process.cpp)
 
-add_library(CEDRIVER_IMU  src/cedriver_imu.cpp )
+add_library(CEDRIVER_IMU  src/cedriver_imu.cpp src/logmsg.cpp src/cpu_set.cpp)
 target_link_libraries(CEDRIVER_IMU CELIB_MadgwickAHRS )
 
 

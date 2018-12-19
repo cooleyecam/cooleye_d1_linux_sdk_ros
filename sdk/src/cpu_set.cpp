@@ -38,12 +38,17 @@ CCpuSet::~CCpuSet()
 {
 }
 
-int CCpuSet::SetCpu(char *pThreadName, int para)
+int CCpuSet::SetCpu(const char *pThreadName, int para)
 {
     int nRet = 0;
     pthread_mutex_lock(&m_Mutex);
-    if (0 != m_nCpuSetFlag && m_nCpuOccNum < m_nCpuPoolSize)
+    if (0 != m_nCpuSetFlag)
     {
+        if (m_nCpuOccNum >= m_nCpuPoolSize)
+        {
+            m_nCpuOccNum = 0;
+        }
+
         cpu_set_t mask;
         CPU_ZERO(&mask);
         int nCpuId = m_aCpuPool[m_nCpuOccNum++];
@@ -65,11 +70,11 @@ int CCpuSet::SetCpu(char *pThreadName, int para)
         {
             if (-1 != para)
             {
-                WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "Set CPU[%d] affinitysucceed! %s%d \n", nCpuId, pThreadName, para);
+                WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "Set CPU[%d] affinity succeed! %s%d \n", nCpuId, pThreadName, para);
             }
             else
             {
-                WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "Set CPU[%d] affinitysucceed! %s \n", nCpuId, pThreadName);
+                WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "Set CPU[%d] affinity succeed! %s \n", nCpuId, pThreadName);
             }
         }
     }
@@ -78,7 +83,7 @@ int CCpuSet::SetCpu(char *pThreadName, int para)
     return nRet;
 }
 
-int CCpuSet::SetCpu(int nCpuId, char *pThreadName, int para)
+int CCpuSet::SetCpu(int nCpuId, const char *pThreadName, int para)
 {
     int nRet = 0;
     pthread_mutex_lock(&m_Mutex);

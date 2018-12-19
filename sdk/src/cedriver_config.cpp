@@ -9,11 +9,11 @@
 #include <boost/iostreams/write.hpp>
 
 global_config_d1 gc_camd1;
-int g_nPara = 0;
+int g_imgvb = 0;
 
 std::ofstream g_PrintfFile;
 
-#if 0
+#if 1
 #define CE_COUT std::cout
 #else
 #define CE_COUT  g_PrintfFile
@@ -201,8 +201,8 @@ static void ce_config_get_img_config()
 
 //gc_camd1.gc_img.cf_img_VB = 850;
 
-if (g_nPara)
-gc_camd1.gc_img.cf_img_VB = g_nPara;
+if (g_imgvb)
+    gc_camd1.gc_img.cf_img_VB = g_imgvb;
 
     CE_COUT << "cf_img_HB: " << gc_camd1.gc_img.cf_img_HB <<std::endl;
     CE_COUT << "cf_img_VB: " << gc_camd1.gc_img.cf_img_VB <<std::endl;

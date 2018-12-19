@@ -43,12 +43,19 @@
 //////   CAM D1  CAM setting
 //////////////////////////////////////////////////////////////////////////
 #define CAMD1_SYS_CLKIN 27000000
+//#define CAMD1_SYS_CLKIN 26666666
+
 
 #define CAMD1_RIGHT     0xF0
 #define CAMD1_LEFT      0xF1
 #define CAMD1_FIRST     CAMD1_RIGHT
 #define CAMD1_LAST      CAMD1_LEFT
 #define CAMD1_CNT_MAX   2
+
+#define CAMD1_RIGHT_IDX (CAMD1_RIGHT-CAMD1_FIRST)
+#define CAMD1_LEFT_IDX  (CAMD1_LEFT-CAMD1_FIRST)
+
+
 
 #define CAMS1_N0      0xB0
 #define CAMS1_N1      0xB1
@@ -114,6 +121,8 @@
 #define GAI_VAL             100
 
 #define CAM_I2C_ADDR        0x5C //0x5C
+
+#define VSCEL_I2C_ADDR      0X40
 
 
 //////////////////////////////////////////////////////////////////////////////////
