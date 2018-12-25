@@ -1,5 +1,6 @@
 
 #include "ceros_cam_d1_driver.h"
+int g_nCtrl = 1;
 
 int main(int argc, char**argv)
 {

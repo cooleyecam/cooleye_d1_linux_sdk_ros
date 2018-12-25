@@ -28,6 +28,8 @@ include_directories(
  ${catkin_INCLUDE_DIRS}
 )
 
+add_library(CELIB_BASE src/logmsg.cpp src/cpu_set.cpp)
+
 add_library(CEDRIVER_CONFIG src/cedriver_config.cpp)
 
 add_library(CEDRIVER_CAM src/cedriver_usb.cpp src/cedriver_cam.cpp)
@@ -35,10 +37,10 @@ add_library(CEDRIVER_CAM src/cedriver_usb.cpp src/cedriver_cam.cpp)
 add_library(CELIB_MadgwickAHRS src/celib_MadgwickAHRS.cpp)
 
 add_library(CEDRIVER_IMU  src/cedriver_imu.cpp )
-target_link_libraries(CEDRIVER_IMU CELIB_MadgwickAHRS )
+target_link_libraries(CEDRIVER_IMU CELIB_MadgwickAHRS CELIB_BASE)
 
 add_library(CEROS_CAM_D1_DRIVER src/ceros_cam_d1_driver.cpp) 
-target_link_libraries(CEROS_CAM_D1_DRIVER CEDRIVER_CONFIG CEDRIVER_CAM CEDRIVER_IMU CELIB_MadgwickAHRS usb-1.0 ${OpenCV_LIBS} ${catkin_LIBRARIES})
+target_link_libraries(CEROS_CAM_D1_DRIVER CEDRIVER_CONFIG CEDRIVER_CAM CEDRIVER_IMU CELIB_MadgwickAHRS CELIB_BASE usb-1.0 ${OpenCV_LIBS} ${catkin_LIBRARIES})
 
 
 add_executable(CEROS_CAM_D1_NODE src/ceros_cam_d1_node.cpp) 

@@ -15,15 +15,17 @@ find_package(OpenCV REQUIRED)
 
 include_directories("${PROJECT_SOURCE_DIR}/include")
 
+add_library(CELIB_BASE src/logmsg.cpp src/cpu_set.cpp)
+
 add_library(CEDRIVER_CONFIG src/cedriver_config.cpp)
 
-add_library(CEDRIVER_CAM src/cedriver_usb.cpp src/cedriver_cam.cpp src/logmsg.cpp src/cpu_set.cpp)
+add_library(CEDRIVER_CAM src/cedriver_usb.cpp src/cedriver_cam.cpp)
 
 add_library(CELIB_MadgwickAHRS src/celib_MadgwickAHRS.cpp)
 
 add_library(CELIB_IMG_PROCESS src/celib_img_process.cpp)
 
-add_library(CEDRIVER_IMU  src/cedriver_imu.cpp src/logmsg.cpp src/cpu_set.cpp)
+add_library(CEDRIVER_IMU  src/cedriver_imu.cpp)
 target_link_libraries(CEDRIVER_IMU CELIB_MadgwickAHRS )
 
 
@@ -31,19 +33,21 @@ target_link_libraries(CEDRIVER_IMU CELIB_MadgwickAHRS )
 
 ## APP
 add_executable(CEAPP_RAW_DATA src/ceapp_raw_data.cpp)
-target_link_libraries(  CEAPP_RAW_DATA 
+target_link_libraries(  CEAPP_RAW_DATA
                         CEDRIVER_CAM 
                         CEDRIVER_CONFIG 
-                        CEDRIVER_IMU   
+                        CEDRIVER_IMU
+			CELIB_BASE
                         usb-1.0 
                         ${OpenCV_LIBS})
 
 
 add_executable(CEAPP_WRITE_DEVICEID src/ceapp_write_deviceid.cpp)
-target_link_libraries(  CEAPP_WRITE_DEVICEID
+target_link_libraries( 	CEAPP_WRITE_DEVICEID
                         CEDRIVER_CAM 
                         CEDRIVER_CONFIG 
-                        CEDRIVER_IMU   
+                        CEDRIVER_IMU
+			CELIB_BASE
                         usb-1.0 
                         ${OpenCV_LIBS})
 
@@ -52,7 +56,8 @@ target_link_libraries(  CEAPP_STEREO_MATCH
                         CEDRIVER_CAM 
                         CEDRIVER_CONFIG 
                         CEDRIVER_IMU  
-                        CELIB_IMG_PROCESS 
+                        CELIB_IMG_PROCESS
+			CELIB_BASE
                         usb-1.0 
                         ${OpenCV_LIBS})
 
@@ -62,31 +67,35 @@ target_link_libraries(  CEAPP_DISP_FILTER
                         CEDRIVER_CONFIG 
                         CEDRIVER_IMU 
                         CELIB_MadgwickAHRS 
-                        CELIB_IMG_PROCESS 
+                        CELIB_IMG_PROCESS
+			CELIB_BASE
                         usb-1.0 
                         ${OpenCV_LIBS})
 
 ## TOOLS
 add_executable(CETOOL_CALI_IMU src/cetool_cali_imu.cpp)
-target_link_libraries(  CETOOL_CALI_IMU  
+target_link_libraries(  CETOOL_CALI_IMU
                         CEDRIVER_IMU  
-                        CEDRIVER_CONFIG 
+                        CEDRIVER_CONFIG
+			CELIB_BASE
                         ${OpenCV_LIBS})
 
 add_executable(CETOOL_STEREO_CAPTURE_IMG src/cetool_cali_stereo_capture_img.cpp)
-target_link_libraries(  CETOOL_STEREO_CAPTURE_IMG 
+target_link_libraries(  CETOOL_STEREO_CAPTURE_IMG
                         CEDRIVER_CAM 
                         CEDRIVER_CONFIG 
                         CEDRIVER_IMU 
                         CELIB_IMG_PROCESS 
+			CELIB_BASE
                         usb-1.0 
                         ${OpenCV_LIBS})
 
 add_executable(CETOOL_CALI_STEREO_CAL src/cetool_cali_stereo_cal.cpp)
-target_link_libraries(  CETOOL_CALI_STEREO_CAL 
+target_link_libraries(  CETOOL_CALI_STEREO_CAL
                         CEDRIVER_CAM 
                         CEDRIVER_CONFIG 
-                        CEDRIVER_IMU 
+                        CEDRIVER_IMU
+			CELIB_BASE
                         usb-1.0 
                         ${OpenCV_LIBS})
                         
