@@ -17,6 +17,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "logmsg.h"
+#include "cpu_set.h"
 
 class CoolEyeCamD1
 {

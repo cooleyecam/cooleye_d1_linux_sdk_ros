@@ -1,6 +1,7 @@
 
 #ifndef _LOGMSG_HDR_
 #define _LOGMSG_HDR_
+#include <sys/sysinfo.h>
 #include <time.h>
 #include <pthread.h>
 #include <stdio.h>

@@ -1414,7 +1414,7 @@ static void *ce_camd1_capture(void *pUserPara)
                 delete timg_pkg;
                 timg_pkg = NULL;
 #endif
-                WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "ce_cam_capture thread exit! cam = 0x%x \r\n", dev->cam);
+                WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "ce_cam_capture thread exit! cam = 0x%x, count = %d\r\n", dev->cam,error_count);
                 pthread_exit(NULL);
             }
             else
