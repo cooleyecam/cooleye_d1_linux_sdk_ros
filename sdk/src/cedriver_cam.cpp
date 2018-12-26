@@ -1637,7 +1637,7 @@ int ce_cams1_preprocess_init()
     return SUCCESS;
 }
 
-int ce_cam_capture_init()
+static void* ce_cam_capture_process(void *argv)
 {
     int ret_val = SUCCESS;
     int r;
@@ -1721,7 +1721,8 @@ int ce_cam_capture_init()
                     {
                         WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "Create camD1 0x%x capture thread failed!\r\n", g_camd1_list[i].cam);
 
-                        return ERROR;
+                        //return ERROR;
+                        return NULL;
                     }
                 }
             }
@@ -1736,7 +1737,8 @@ int ce_cam_capture_init()
                     if(r)
                     {
                         WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "Create camS1 0x%x capture thread failed!\r\n", g_cams1_list[i].cam);
-                        return ERROR;
+                        //return ERROR;
+                        return NULL;
                     }
                 }
             }
@@ -1774,6 +1776,20 @@ int ce_cam_capture_init()
     }
 
     WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "ce_cam_capture_init finish! \r\n");
+    //return SUCCESS;
+    return NULL;
+}
+
+int ce_cam_capture_init()
+{
+    int temp = 0;
+    temp = pthread_create(&ce_cam_preprocess_thread, NULL, ce_cam_capture_process, NULL);
+    if(temp)
+    {
+        LOG("celog: Failed to create thread capture image \r\n");
+        return ERROR;
+
+    }
     return SUCCESS;
 }
 
