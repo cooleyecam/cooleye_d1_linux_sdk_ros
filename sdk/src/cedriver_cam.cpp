@@ -56,6 +56,10 @@ bool ce_cam_preprocess_stop_run = false;
 
 threadsafe_queue<d1_img_output_pkg *> img_pkg_list_d1;
 
+threadsafe_queue<s1_img_output_pkg *> img_pkg_list_s1num0;
+threadsafe_queue<s1_img_output_pkg *> img_pkg_list_s1num1;
+threadsafe_queue<s1_img_output_pkg *> img_pkg_list_s1num2;
+
 bool ce_cam_rst_flag_left = false;
 bool ce_cam_rst_flag_right = false;
 
@@ -63,6 +67,28 @@ extern int g_nCtrl;
 int g_nForceWriteFlag;
 int g_nCamSerial_D = 1;
 int g_nCamSerial_S = 1;
+
+
+
+
+unsigned char ce_cam_polling_flag = CAMS1_N0;   //  F0 is  D1 
+                                                //  B0 is  S1
+
+void ce_cam_polling_flag_init()
+{
+    ce_cam_polling_flag = CAMS1_N0;
+}
+
+void ce_cam_polling_flag_set_to_next()
+{
+    switch(ce_cam_polling_flag)
+    {
+        case CAMS1_N0 : ce_cam_polling_flag = CAMS1_N1; break;
+        case CAMS1_N1 : ce_cam_polling_flag = CAMS1_N2; break;
+        case CAMS1_N2 : ce_cam_polling_flag = CAMS1_N0; break;
+        default : ce_cam_polling_flag = CAMS1_N0; break;
+    }
+}
 
 
 int ce_get_cams1_index(int cam_num)
@@ -1082,8 +1108,9 @@ static void* ce_cam_showimg(void *)
 
     d1_img_output_pkg *img_lr_pkg;
 
+
     cv::Mat img_s1(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
-    img_pkg *s1_img_pkg = NULL;
+    s1_img_output_pkg *s1_img_pkg = NULL;
 
     cv::Mat img_temp;
 
@@ -1098,37 +1125,64 @@ static void* ce_cam_showimg(void *)
 
     while(!ce_cam_showimg_stop_run)
     {
-        flag = false;
+        // flag = false;
 
-        for (int i = 0; i < CAMS1_CNT_MAX; i++)
-        {
-            dev = &g_cams1_list[i];
-            if(!dev->list.empty())
-            {
-                dev->list.try_pop(s1_img_pkg);
-#ifdef CA_SHOW_IMG
-                memcpy(img_s1.data,s1_img_pkg->data,ce_config_get_cf_img_size());
-                cv::cvtColor(img_s1, img_temp, cv::COLOR_GRAY2BGR);
-                cv::circle(img_temp, cv::Point(376,240),10, cv::Scalar(0,0,255));
+//         for (int i = 0; i < CAMS1_CNT_MAX; i++)
+//         {
+//             dev = &g_cams1_list[i];
+//             if(!dev->list.empty())
+//             {
+//                 dev->list.try_pop(s1_img_pkg);
+// #ifdef CA_SHOW_IMG
+//                 memcpy(img_s1.data,s1_img_pkg->data,ce_config_get_cf_img_size());
+//                 cv::cvtColor(img_s1, img_temp, cv::COLOR_GRAY2BGR);
+//                 cv::circle(img_temp, cv::Point(376,240),10, cv::Scalar(0,0,255));
 
-                s1_title[s1_title_len] = '0' + i;
-                cv::imshow(s1_title,img_temp);
-                flag = true;
-#endif
-                delete s1_img_pkg;
-                s1_img_pkg = NULL;
+//                 s1_title[s1_title_len] = '0' + i;
+//                 cv::imshow(s1_title,img_temp);
+//                 flag = true;
+// #endif
+//                 delete s1_img_pkg;
+//                 s1_img_pkg = NULL;
 
-            }
+//             }
+//         }
+
+        if(!img_pkg_list_s1num0.empty())
+        {   
+            img_pkg_list_s1num0.try_pop(s1_img_pkg);
+            memcpy(img_s1.data,s1_img_pkg->s1_img->data,ce_config_get_cf_img_size());
+            cv::imshow("s0_num0",img_s1);
+
+            delete s1_img_pkg;
+            s1_img_pkg = NULL;
         }
+
+        if(!img_pkg_list_s1num1.empty())
+        {   
+            img_pkg_list_s1num1.try_pop(s1_img_pkg);
+            memcpy(img_s1.data,s1_img_pkg->s1_img->data,ce_config_get_cf_img_size());
+            cv::imshow("s0_num1",img_s1);
+
+            delete s1_img_pkg;
+            s1_img_pkg = NULL;
+        }
+
+        if(!img_pkg_list_s1num2.empty())
+        {   
+            img_pkg_list_s1num2.try_pop(s1_img_pkg);
+            memcpy(img_s1.data,s1_img_pkg->s1_img->data,ce_config_get_cf_img_size());
+            cv::imshow("s0_num2",img_s1);
+
+            delete s1_img_pkg;
+            s1_img_pkg = NULL;
+        }
+
+        cv::waitKey(1);
+
 
         if(!img_pkg_list_d1.try_pop(img_lr_pkg))
         {
-            //usleep(1000);
-            if (flag)
-            {
-                cv::waitKey(1);
-            }
-
             continue;
         }
 #ifdef CA_SHOW_IMG
@@ -1238,8 +1292,20 @@ static void* ce_cam_preprocess(void *)
     img_pkg *l_img_pkg = NULL;
     img_pkg *r_img_pkg = NULL;
 
+    img_pkg *s1n0_img_pkg = NULL;
+    img_pkg *s1n1_img_pkg = NULL;
+    img_pkg *s1n2_img_pkg = NULL;
+
     threadsafe_queue<img_pkg *> *right_list = &g_camd1_list[CAMD1_RIGHT_IDX].list;
     threadsafe_queue<img_pkg *> *left_list = &g_camd1_list[CAMD1_LEFT_IDX].list;
+
+    threadsafe_queue<img_pkg *> *s1num0_list = &g_cams1_list[0].list;
+    threadsafe_queue<img_pkg *> *s1num1_list = &g_cams1_list[1].list;
+    threadsafe_queue<img_pkg *> *s1num2_list = &g_cams1_list[2].list;
+
+
+
+    ce_cam_polling_flag_init();
 
     while(!ce_cam_preprocess_stop_run)
     {
@@ -1311,7 +1377,80 @@ static void* ce_cam_preprocess(void *)
             }
 
         }
-        //usleep(1000);
+
+                //s1n0
+        if((!s1num0_list->empty()))
+        {
+            
+            s1num0_list->try_pop(s1n0_img_pkg);
+            s1_img_output_pkg *t_output_pkg = new s1_img_output_pkg;
+            if (NULL == t_output_pkg)
+            {
+                LOG("celog: ce_cam_showimg alloc memory failure2!\r\n");
+                delete s1n0_img_pkg;
+                continue;
+            }
+            
+            t_output_pkg->s1_img = s1n0_img_pkg;
+            s1_img_output_pkg *t_pkg_giveup = NULL;
+
+            img_pkg_list_s1num0.push(t_output_pkg, t_pkg_giveup, 30);
+            if (NULL != t_pkg_giveup)
+            {
+                delete t_pkg_giveup->s1_img;
+                delete t_pkg_giveup;
+            }
+        }
+
+        //s1n1
+        if((!s1num1_list->empty()))
+        {
+           
+            s1num1_list->try_pop(s1n1_img_pkg);
+            s1_img_output_pkg *t_output_pkg = new s1_img_output_pkg;
+            if (NULL == t_output_pkg)
+            {
+                LOG("celog: ce_cam_showimg alloc memory failure2!\r\n");
+                delete s1n1_img_pkg;
+                continue;
+            }
+            
+            t_output_pkg->s1_img = s1n1_img_pkg;
+            s1_img_output_pkg *t_pkg_giveup = NULL;
+
+            img_pkg_list_s1num1.push(t_output_pkg, t_pkg_giveup, 30);
+            if (NULL != t_pkg_giveup)
+            {
+                delete t_pkg_giveup->s1_img;
+                delete t_pkg_giveup;
+            }
+        }
+
+        //s1n2
+        if((!s1num2_list->empty()))
+        {
+            
+            s1num2_list->try_pop(s1n2_img_pkg);
+            s1_img_output_pkg *t_output_pkg = new s1_img_output_pkg;
+            if (NULL == t_output_pkg)
+            {
+                LOG("celog: ce_cam_showimg alloc memory failure2!\r\n");
+                delete s1n2_img_pkg;
+                continue;
+            }
+            
+            t_output_pkg->s1_img = s1n2_img_pkg;
+            s1_img_output_pkg *t_pkg_giveup = NULL;
+
+            img_pkg_list_s1num2.push(t_output_pkg, t_pkg_giveup, 30);
+            if (NULL != t_pkg_giveup)
+            {
+                delete t_pkg_giveup->s1_img;
+                delete t_pkg_giveup;
+            }
+        }
+
+        usleep(1000);
     }
     pthread_exit(NULL);
 }
@@ -1501,25 +1640,23 @@ static void *ce_cams1_capture(void *pUserPara)
     img_pkg *timg_pkg;
     uint32_t error_count = 0;
     uint32_t checkerr_count = 0;
+    uint32_t img_count = 0;
 
     CCpuSet::instance()->SetCpu("s1cam_n", ce_get_cams1_index(dev->cam));
+
+    while(ce_cam_polling_flag != dev->cam);
 
     while(!ce_cam_capture_stop_run)
     {
 
-#ifdef TEST_DEBUG
-        timg_pkg = &timg_pkg_temp;
-#else
         timg_pkg = new img_pkg;
-#endif
         if (NULL == timg_pkg)
         {
             LOG("ce_cams1_capture alloc memory failure! exit thread!\r\n");
             break;
         }
 
-//      memset(timg_pkg, 0, sizeof(img_pkg));
-        r = libusb_bulk_transfer(dev->handle, 0x82, timg_pkg->data, ce_config_get_cf_img_buff_size(), &transferred, 1000);
+        r = libusb_bulk_transfer(dev->handle, 0x82, timg_pkg->data, ce_config_get_cf_img_buff_size(), &transferred, 400);
         gettimeofday(&cap_systime,NULL);
         timg_pkg->timestamp = cap_systime.tv_sec+0.000001*cap_systime.tv_usec-ce_config_get_cf_img_time_offset();
 
@@ -1529,22 +1666,17 @@ static void *ce_cams1_capture(void *pUserPara)
             if (error_count >= 1000)
             {
                 dev->read_error_flag = true;
-
-#ifndef TEST_DEBUG
-
                 delete timg_pkg;
                 timg_pkg = NULL;
-#endif
-                WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "ce_cams1_capture thread exit! cam = 0x%x \r\n", dev->cam);
 
+                WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "ce_cams1_capture thread exit! cam = 0x%x \r\n", dev->cam);
                 pthread_exit(NULL);
             }
             else
             {
-#ifndef TEST_DEBUG
                 delete timg_pkg;
                 timg_pkg = NULL;
-#endif
+
                 continue;
             }
         }
@@ -1556,25 +1688,39 @@ static void *ce_cams1_capture(void *pUserPara)
 
         if(pass == 1)
         {
+            
+            if(img_count>5)
+            {
+                img_count = 0;
+                ce_cam_polling_flag_set_to_next();
+            }
+            else
+            {
+                img_count++;
+            }
+
             dev->read_error_flag = false;
             error_count = 0;
             img_pkg *timg_pkg_giveup = NULL;
 
-#ifndef TEST_DEBUG
             if (0 == dev->list.push(timg_pkg, timg_pkg_giveup, 30))
             {
                 delete timg_pkg_giveup;
             }
-#endif
+
+            while(ce_cam_polling_flag != dev->cam);
+
+
         }
         else
         {
-            checkerr_count++;
-#ifndef TEST_DEBUG
+            error_count++;
+
             delete timg_pkg;
             timg_pkg = NULL;
-#endif
-            LOG("cam 0x%x bulk transfer check failed: %d, check error count: %d\n", dev->cam, r, checkerr_count);
+
+           LOG("cam 0x%x bulk transfer check failed: %d, check error count: %d\n", dev->cam, r, error_count);
+           LOG("cam 0x%x  flag%x \n", dev->cam, ce_cam_polling_flag);
 
             ce_cam_ctrl_camera(dev->cam,SET_MCLK_48MHz);
         }

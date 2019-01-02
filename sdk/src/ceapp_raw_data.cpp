@@ -98,15 +98,15 @@ int main(int argc, char* argv[])
     {
         WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "ce_cam_preprocess_init  sucess \r\n");
 
-        r = ce_cam_showimg_init();
-        if(r < 0)
-        {
-            WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "ce_cam_showimg_init  error \r\n");
-        }
-        else
-        {
-            WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "ce_cam_showimg_init  sucess \r\n");
-        }
+        // r = ce_cam_showimg_init();
+        // if(r < 0)
+        // {
+        //     WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_ERROR, "ce_cam_showimg_init  error \r\n");
+        // }
+        // else
+        // {
+        //     WRITE_LOG(LOGMSG_ALL, LOGMSG_LEVEL_INFO, "ce_cam_showimg_init  sucess \r\n");
+        // }
     }
 
     g_nCtrl = 1;

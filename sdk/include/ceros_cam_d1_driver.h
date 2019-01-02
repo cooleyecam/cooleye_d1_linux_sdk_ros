@@ -38,10 +38,10 @@ public:
     boost::thread *cam_thread_;
     boost::thread *imu_thread_;
 
-    cv::Mat img_left_, img_right_;
-    cv_bridge::CvImage left_bridge_, right_bridge_;
+    cv::Mat img_left_, img_right_, img_s1n0_, img_s1n1_, img_s1n2_;
+    cv_bridge::CvImage left_bridge_, right_bridge_, s1n0_bridge_, s1n1_bridge_, s1n2_bridge_;
 
-    image_transport::Publisher pub_caml_, pub_camr_;
+    image_transport::Publisher pub_caml_, pub_camr_, pub_cams1n0_, pub_cams1n1_, pub_cams1n2_;
     ros::Publisher pub_imu_;
 
     bool cam_thread_stop_run_;

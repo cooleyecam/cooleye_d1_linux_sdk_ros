@@ -15,6 +15,11 @@ struct d1_img_output_pkg
     img_pkg *right_img;
 };
 
+struct s1_img_output_pkg
+{
+    img_pkg *s1_img;
+};
+
 typedef struct ce_cams1_dev_s
 {
     libusb_device_handle *handle;
