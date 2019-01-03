@@ -1656,7 +1656,7 @@ static void *ce_cams1_capture(void *pUserPara)
             break;
         }
 
-        r = libusb_bulk_transfer(dev->handle, 0x82, timg_pkg->data, ce_config_get_cf_img_buff_size(), &transferred, 400);
+        r = libusb_bulk_transfer(dev->handle, 0x82, timg_pkg->data, ce_config_get_cf_img_buff_size(), &transferred, 500);
         gettimeofday(&cap_systime,NULL);
         timg_pkg->timestamp = cap_systime.tv_sec+0.000001*cap_systime.tv_usec-ce_config_get_cf_img_time_offset();
 
@@ -1689,7 +1689,7 @@ static void *ce_cams1_capture(void *pUserPara)
         if(pass == 1)
         {
             
-            if(img_count>5)
+            if(img_count>10)
             {
                 img_count = 0;
                 ce_cam_polling_flag_set_to_next();
