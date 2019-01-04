@@ -1410,7 +1410,7 @@ static void *ce_camd1_capture(void *pUserPara)
         }
 
         //memset(timg_pkg, 0, sizeof(img_pkg));
-        r = libusb_bulk_transfer(pcam_handle, 0x82, timg_pkg->data, ce_config_get_cf_img_buff_size(), &transferred, 1000);
+        r = libusb_bulk_transfer(pcam_handle, 0x82, timg_pkg->data, ce_config_get_cf_img_buff_size(), &transferred, 500);
         gettimeofday(&cap_systime,NULL);
         timg_pkg->timestamp = cap_systime.tv_sec+0.000001*cap_systime.tv_usec-ce_config_get_cf_img_time_offset();
 
@@ -1488,7 +1488,11 @@ static void *ce_cams1_capture(void *pUserPara)
     ce_vscel_i2c_write(dev->cam,0x0C,0x55);
     ce_vscel_i2c_write(dev->cam,0x0D,0x55);
 
-    ce_cam_set_mt9v034_fps(dev->cam);
+    //ce_cam_set_mt9v034_fps(dev->cam);
+
+    ce_cam_i2c_write(dev->cam,0x05,0x02FF);
+    ce_cam_i2c_write(dev->cam,0x06,0x003F);
+
 
     ce_cam_set_mt9v034_EG_mode(dev->cam);
 
@@ -1496,6 +1500,9 @@ static void *ce_cams1_capture(void *pUserPara)
 
     usleep(1000);
 
+ 
+
+    
     ce_cam_i2c_write(dev->cam,0x0C,0x0001);
     ce_cam_ctrl_camera(dev->cam,STANDBY_SHORT);
 
