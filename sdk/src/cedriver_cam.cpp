@@ -1589,8 +1589,8 @@ static void *ce_cams1_capture(void *pUserPara)
             delete timg_pkg;
             timg_pkg = NULL;
 
-            LOG("cam 0x%x bulk transfer check failed: %d, check error count: %d\n", dev->cam, r, error_count);
-            LOG("cam 0x%x  flag%x \n", dev->cam, ce_cam_polling_flag);
+            //LOG("cam 0x%x bulk transfer check failed: %d, check error count: %d\n", dev->cam, r, error_count);
+            //LOG("cam 0x%x  flag%x \n", dev->cam, ce_cam_polling_flag);
             
             ce_cam_ctrl_camera(dev->cam,SET_MCLK_48MHz);
         }
