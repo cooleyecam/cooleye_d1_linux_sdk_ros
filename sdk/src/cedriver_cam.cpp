@@ -69,45 +69,42 @@ int g_nCamSerial_D = 1;
 int g_nCamSerial_S = 1;
 
 
+static unsigned char status = 0;
 
-
-// unsigned char ce_cam_polling_flag = CAMS1_N0;   //  F0 is  D1 
-//                                                 //  B0 is  S1
-
-// void ce_cam_polling_flag_init()
-// {
-//     ce_cam_polling_flag = CAMS1_N0;
-// }
-
-// void ce_cam_polling_flag_set_to_next()
-// {
-//     switch(ce_cam_polling_flag)
-//     {
-//         case CAMS1_N0 : ce_cam_polling_flag = CAMS1_N1; break;
-//         case CAMS1_N1 : ce_cam_polling_flag = CAMS1_N2; break;
-//         case CAMS1_N2 : ce_cam_polling_flag = CAMS1_N0; break;
-//         default : ce_cam_polling_flag = CAMS1_N0; break;
-//     }
-// }
-
-
-unsigned char ce_cam_polling_flag = CAMS1_N1;   //  F0 is  D1 
+unsigned char ce_cam_polling_flag = CAMS1_N0;   //  F0 is  D1 
                                                 //  B0 is  S1
 
 void ce_cam_polling_flag_init()
 {
-    ce_cam_polling_flag = CAMS1_N1;
+    ce_cam_polling_flag = CAMS1_N0;
+    status = 0;
 }
 
 void ce_cam_polling_flag_set_to_next()
 {
-    switch(ce_cam_polling_flag)
+    status++;
+    if(status>3)
     {
-        case CAMS1_N1 : ce_cam_polling_flag = CAMS1_N2; break;
-        case CAMS1_N2 : ce_cam_polling_flag = CAMS1_N1; break;
-        default : ce_cam_polling_flag = CAMS1_N1; break;
+        status = 0;
+    }
+
+    switch (status)
+    {
+        case 0 : ce_cam_polling_flag = CAMS1_N1; break;
+        case 1 : ce_cam_polling_flag = CAMS1_N0; break;
+        case 2 : ce_cam_polling_flag = CAMS1_N2; break;
+        case 3 : ce_cam_polling_flag = CAMS1_N0; break;
+        default : ce_cam_polling_flag = CAMS1_N0; break;
     }
 }
+    // switch(ce_cam_polling_flag)
+    // {
+    //     case CAMS1_N0 : ce_cam_polling_flag = CAMS1_N1; break;
+    //     case CAMS1_N1 : ce_cam_polling_flag = CAMS1_N2; break;
+    //     case CAMS1_N2 : ce_cam_polling_flag = CAMS1_N0; break;
+    //     default : ce_cam_polling_flag = CAMS1_N0; break;
+    // }
+
 
 
 int ce_get_cams1_index(int cam_num)
@@ -1514,10 +1511,10 @@ static void *ce_cams1_capture(void *pUserPara)
 
     CCpuSet::instance()->SetCpu("s1cam_n", ce_get_cams1_index(dev->cam));
 
-    if(dev->cam != CAMS1_N0)
-    {
-        while(ce_cam_polling_flag != dev->cam);
-    }
+
+    while(ce_cam_polling_flag != dev->cam);
+
+
 
     while(!ce_cam_capture_stop_run)
     {
@@ -1561,17 +1558,15 @@ static void *ce_cams1_capture(void *pUserPara)
 
         if(pass == 1)
         {
-            if(dev->cam != CAMS1_N0)
+
+            if(img_count>10)
             {
-                if(img_count>10)
-                {
-                    img_count = 0;
-                    ce_cam_polling_flag_set_to_next();
-                }
-                else
-                {
-                    img_count++;
-                }
+                img_count = 0;
+                ce_cam_polling_flag_set_to_next();
+            }
+            else
+            {
+                img_count++;
             }
             
             dev->read_error_flag = false;
@@ -1583,10 +1578,8 @@ static void *ce_cams1_capture(void *pUserPara)
                 delete timg_pkg_giveup;
             }
 
-            if(dev->cam != CAMS1_N0)
-            {
-                while(ce_cam_polling_flag != dev->cam);
-            }
+            while(ce_cam_polling_flag != dev->cam);
+
 
         }
         else
