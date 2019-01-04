@@ -1519,7 +1519,10 @@ static void *ce_cams1_capture(void *pUserPara)
     CCpuSet::instance()->SetCpu("s1cam_n", ce_get_cams1_index(dev->cam));
 
 
-    while(ce_cam_polling_flag != dev->cam);
+    while(ce_cam_polling_flag != dev->cam)
+    {
+        usleep(500);
+    }
 
 
 
