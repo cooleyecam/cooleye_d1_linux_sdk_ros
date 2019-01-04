@@ -1585,7 +1585,10 @@ static void *ce_cams1_capture(void *pUserPara)
                 delete timg_pkg_giveup;
             }
 
-            while(ce_cam_polling_flag != dev->cam);
+            while(ce_cam_polling_flag != dev->cam)
+            {
+                usleep(1000);
+            }
 
 
         }
