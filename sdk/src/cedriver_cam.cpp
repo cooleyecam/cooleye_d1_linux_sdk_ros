@@ -1125,29 +1125,6 @@ static void* ce_cam_showimg(void *)
 
     while(!ce_cam_showimg_stop_run)
     {
-        // flag = false;
-
-//         for (int i = 0; i < CAMS1_CNT_MAX; i++)
-//         {
-//             dev = &g_cams1_list[i];
-//             if(!dev->list.empty())
-//             {
-//                 dev->list.try_pop(s1_img_pkg);
-// #ifdef CA_SHOW_IMG
-//                 memcpy(img_s1.data,s1_img_pkg->data,ce_config_get_cf_img_size());
-//                 cv::cvtColor(img_s1, img_temp, cv::COLOR_GRAY2BGR);
-//                 cv::circle(img_temp, cv::Point(376,240),10, cv::Scalar(0,0,255));
-
-//                 s1_title[s1_title_len] = '0' + i;
-//                 cv::imshow(s1_title,img_temp);
-//                 flag = true;
-// #endif
-//                 delete s1_img_pkg;
-//                 s1_img_pkg = NULL;
-
-//             }
-//         }
-
         if(!img_pkg_list_s1num0.empty())
         {   
             img_pkg_list_s1num0.try_pop(s1_img_pkg);
@@ -1597,6 +1574,7 @@ static void *ce_camd1_capture(void *pUserPara)
 
             ce_cam_ctrl_camera(dev->cam, SET_MCLK_48MHz);
         }
+        usleep(500);
     }
 }
 
@@ -1721,6 +1699,7 @@ static void *ce_cams1_capture(void *pUserPara)
 
             ce_cam_ctrl_camera(dev->cam,SET_MCLK_48MHz);
         }
+        usleep(500);
     }
 
     pthread_exit(NULL);
