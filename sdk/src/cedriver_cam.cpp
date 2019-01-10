@@ -1110,7 +1110,13 @@ static void* ce_cam_showimg(void *)
 
 
     cv::Mat img_s1(cv::Size(ce_config_get_cf_img_width(),ce_config_get_cf_img_height()),CV_8UC1);
+
     s1_img_output_pkg *s1_img_pkg = NULL;
+
+
+    cv::Mat result(img_left.rows,
+                   img_left.cols + img_right.cols,
+                   img_left.type());
 
     cv::Mat img_temp;
 
@@ -1131,6 +1137,7 @@ static void* ce_cam_showimg(void *)
             memcpy(img_s1.data,s1_img_pkg->s1_img->data,ce_config_get_cf_img_size());
             cv::imshow("s0_num0",img_s1);
 
+            delete s1_img_pkg->s1_img;
             delete s1_img_pkg;
             s1_img_pkg = NULL;
         }
@@ -1141,6 +1148,7 @@ static void* ce_cam_showimg(void *)
             memcpy(img_s1.data,s1_img_pkg->s1_img->data,ce_config_get_cf_img_size());
             cv::imshow("s0_num1",img_s1);
 
+            delete s1_img_pkg->s1_img;
             delete s1_img_pkg;
             s1_img_pkg = NULL;
         }
@@ -1151,15 +1159,14 @@ static void* ce_cam_showimg(void *)
             memcpy(img_s1.data,s1_img_pkg->s1_img->data,ce_config_get_cf_img_size());
             cv::imshow("s0_num2",img_s1);
 
+            delete s1_img_pkg->s1_img;
             delete s1_img_pkg;
             s1_img_pkg = NULL;
         }
 
-        cv::waitKey(1);
-
-
         if(!img_pkg_list_d1.try_pop(img_lr_pkg))
         {
+            cv::waitKey(1);
             continue;
         }
 #ifdef CA_SHOW_IMG
@@ -1171,17 +1178,13 @@ static void* ce_cam_showimg(void *)
         //cv::imshow("right",img_right);
         //std::cout << "right tamps:" << std::setprecision(15) << img_lr_pkg->right_img->timestamp << std::endl;
 
-        cv::Mat result(img_left.rows,
-                   img_left.cols + img_right.cols,
-                   img_left.type());
+        
 
         img_left.colRange( 0, img_left.cols).copyTo(result.colRange(0, img_left.cols));
 
         img_right.colRange( 0, img_right.cols).copyTo(result.colRange(img_left.cols, result.cols));
-        cv::cvtColor(result, img_temp, cv::COLOR_GRAY2BGR);
-        cv::circle(img_temp, cv::Point(376,240),10, cv::Scalar(0,0,255));
-        cv::circle(img_temp, cv::Point(1128,240),10, cv::Scalar(0,0,255));
-        cv::imshow("left",img_temp);
+
+        cv::imshow("result",result);
 
         cv::waitKey(1);
 #endif
@@ -1280,8 +1283,6 @@ static void* ce_cam_preprocess(void *)
     threadsafe_queue<img_pkg *> *s1num1_list = &g_cams1_list[1].list;
     threadsafe_queue<img_pkg *> *s1num2_list = &g_cams1_list[2].list;
 
-
-
     ce_cam_polling_flag_init();
 
     while(!ce_cam_preprocess_stop_run)
@@ -1355,10 +1356,9 @@ static void* ce_cam_preprocess(void *)
 
         }
 
-                //s1n0
+        // s1n0
         if((!s1num0_list->empty()))
         {
-            
             s1num0_list->try_pop(s1n0_img_pkg);
             s1_img_output_pkg *t_output_pkg = new s1_img_output_pkg;
             if (NULL == t_output_pkg)
@@ -1367,7 +1367,7 @@ static void* ce_cam_preprocess(void *)
                 delete s1n0_img_pkg;
                 continue;
             }
-            
+
             t_output_pkg->s1_img = s1n0_img_pkg;
             s1_img_output_pkg *t_pkg_giveup = NULL;
 
@@ -1694,8 +1694,7 @@ static void *ce_cams1_capture(void *pUserPara)
             delete timg_pkg;
             timg_pkg = NULL;
 
-           LOG("cam 0x%x bulk transfer check failed: %d, check error count: %d\n", dev->cam, r, error_count);
-           LOG("cam 0x%x  flag%x \n", dev->cam, ce_cam_polling_flag);
+            LOG("cam 0x%x bulk transfer check failed: %d, check error count: %d\n", dev->cam, r, error_count);
 
             ce_cam_ctrl_camera(dev->cam,SET_MCLK_48MHz);
         }
