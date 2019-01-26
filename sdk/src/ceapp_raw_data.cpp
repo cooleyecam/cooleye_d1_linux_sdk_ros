@@ -23,7 +23,7 @@
 int g_nCtrl = 1;
 extern int g_imgvb;
 
-//#define CE_RAW_DATA_IMU
+#define CE_RAW_DATA_IMU
 
 void SIGINTHandler(int nSig)
 {

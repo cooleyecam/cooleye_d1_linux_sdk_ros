@@ -43,8 +43,8 @@ int main(int argc, char**argv)
     if(!CoolEyeCamD1RUN.start_cam_D1_capture())
         std::cout << "ERROR: camera open failed" << std::endl;
 
-    // if(!CoolEyeCamD1RUN.start_imu_icm26089())
-    //     std::cout << "ERROR: imu open failed" << std::endl;
+     if(!CoolEyeCamD1RUN.start_imu_icm26089())
+         std::cout << "ERROR: imu open failed" << std::endl;
 
     CoolEyeCamD1RUN.exectu();
 
